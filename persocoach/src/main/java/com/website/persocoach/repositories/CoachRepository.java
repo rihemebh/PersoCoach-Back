@@ -1,7 +1,7 @@
 package com.website.persocoach.repositories;
 
-import com.website.persocoach.Models.coach;
+import com.website.persocoach.Models.Coach;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface coachRepository extends MongoRepository<coach,String> {
+public interface CoachRepository extends MongoRepository<Coach,String> {
 }

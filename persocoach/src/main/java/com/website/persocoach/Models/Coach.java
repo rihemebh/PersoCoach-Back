@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 @Data
-public class coach implements Serializable {
+public class Coach implements Serializable {
     @Id
     private int id;
     private String name;
