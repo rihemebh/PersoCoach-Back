@@ -60,7 +60,7 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-			q		</excludes>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
