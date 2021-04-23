@@ -50,8 +50,7 @@ public class CoachController {
 
 
     @RequestMapping(value="/coach/add", method=RequestMethod.PUT)
-    public ResponseEntity<Coach>  addCoach(Coach c) throws URISyntaxException {
-
+    public ResponseEntity<Coach>addCoach(@RequestBody Coach c) throws URISyntaxException {
         Coach co=  repository.save(c);
         return ResponseEntity.created(new URI("/coach/add" +co.getId())).body(co);
 
