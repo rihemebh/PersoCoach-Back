@@ -1,0 +1,21 @@
+server:
+  error:
+    include-message: always
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+      authentication-database: admin
+      username: admin
+      password: password
+      database: persocoach
+      port: 27017
+      host: localhost
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
