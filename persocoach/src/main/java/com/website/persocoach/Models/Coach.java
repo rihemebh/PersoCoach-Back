@@ -3,6 +3,7 @@ package com.website.persocoach.Models;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 
 @Data
+@Document(collection = "coach")
 public class Coach implements Serializable {
 
     public Coach(String id,String name, String type, String gender, String description, int rate) {
@@ -30,6 +32,7 @@ public class Coach implements Serializable {
     private String type;
     @Field(value = "gender")
     private String gender;
+    private String url;
     @Field(value = "desriptio,")
     private String description;
     @Field(value = "acadamic_Exp")
