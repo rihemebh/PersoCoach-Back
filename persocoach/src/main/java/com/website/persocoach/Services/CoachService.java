@@ -42,9 +42,9 @@ public class CoachService {
     }
 
 
-    public Page<Coach> findByName(String name, Pageable page) {
+    public Page<Coach> findByNameOrType(String key, Pageable page) {
 
-        return  repo.findAllByName(name,page);
+        return  repo.findAllByNameOrType(key,page);
     }
 
 

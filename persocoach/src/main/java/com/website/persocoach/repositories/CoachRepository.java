@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public interface CoachRepository extends MongoRepository<Coach,String>, PagingAndSortingRepository<Coach,String> {
 
-@Query("{ 'name' : /?0/ }")
-Page<Coach> findAllByName(String name, Pageable page);
+@Query("{ $or: [ { 'name' : /?0/ } , { 'type' : ?0 } ] }")
+Page<Coach> findAllByNameOrType(String key, Pageable page);
 @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/ }")
 Page<Coach> findAllByRateTOrTypeOrGender(int rate, String type, String gender, Pageable page);
 @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/ }")

@@ -29,7 +29,7 @@ public class CoachController {
         this.repository = repository;
     }
     @RequestMapping(value="/coaches",method = RequestMethod.GET)
-    public Page<Coach> coaches(@RequestParam("name") Optional<String> name ,
+    public Page<Coach> coaches(@RequestParam("key") Optional<String> key,
                                @RequestParam("type") Optional<String> type ,
                                @RequestParam("rate") Optional<Integer> rate ,
                                @RequestParam("gender") Optional<String> gender ,
@@ -50,16 +50,16 @@ public class CoachController {
 //
 //            Coach c = new Coach();
 //            c.setName(faker.name().fullName());
-//            c.setType(types[faker.number().numberBetween(0, 1)]);
+//            c.setType(types[faker.number().numberBetween(0, 2)]);
 //            c.setId(faker.idNumber().toString());
-//            c.setGender(genders[faker.number().numberBetween(0, 1)]);
+//            c.setGender(genders[faker.number().numberBetween(0, 2)]);
 //            c.setUrl(faker.internet().image());
 //            c.setDescription(faker.lorem().paragraph());
 //            acadamicExp.add(faker.lorem().sentence());
 //            acadamicExp.add(faker.lorem().sentence());
 //            workExp.add(faker.lorem().sentence());
 //            workExp.add(faker.lorem().sentence());
-//            c.setRate(faker.number().numberBetween(0, 5));
+//            c.setRate(faker.number().numberBetween(0, 6));
 //            reviews.add(faker.lorem().sentence());
 //            c.setWorkExp(workExp);
 //            c.setAcadamicExp(acadamicExp);
@@ -73,14 +73,28 @@ public class CoachController {
 //                    Sort.by(sort.orElse("rate")).descending()));
 //
 //     }
-        if (direction.orElse(0) == 1) {
-        return repository.findByRateTypeGender(rate.orElse(5),type.orElse(""),gender.orElse(""),
-                PageRequest.of(page.orElse(0),8,Sort.by(sort.orElse("rate")).ascending()));
+
+        if (key.isEmpty()) {
+            if (direction.orElse(0) == 1) {
+                return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
+                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
+            } else {
+                return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
+                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
+            }
         } else {
-            return repository.findByRateTypeGender(rate.orElse(5),type.orElse(""),gender.orElse(""),
-                    PageRequest.of(page.orElse(0),8,Sort.by(sort.orElse("rate")).descending()));
+            if (direction.orElse(0) == 1) {
+                return repository.findByNameOrType(key.orElse(""),
+                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
+            } else {
+                return repository.findByNameOrType(key.orElse(""),
+                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
+            }
         }
+
     }
+
+
 
 //    @RequestMapping(value="/coaches",method= RequestMethod.GET)
 //    public Page<Coach> getCoachesByFilter(@RequestParam("rate") int rate, @RequestParam("gender") String gender,
