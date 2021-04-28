@@ -22,8 +22,11 @@ public class CoachService {
         repo.save(c);
     }
 
-    public int getNbCoaches(int rate,String type,String gender) {
-        return repo.findAllByRateTOrTypeOrGender(rate,type,gender).size();
+    public int getNbCoaches(String key,int rate,String type,String gender) {
+
+            return repo.findAllByRateTOrTypeOrGenderOrName(rate,type,gender,key).size();
+
+
 
     }
 
@@ -48,8 +51,8 @@ public class CoachService {
     }
 
 
-   public Page<Coach> findByRateTypeGender(int rate, String type , String gender, Pageable page){
-        return repo.findAllByRateTOrTypeOrGender(rate,type,gender,page);
+   public Page<Coach> findByRateTypeGender(int rate, String type , String gender, String key ,Pageable page){
+        return repo.findAllByRateTOrTypeOrGenderOrName(rate,type,gender,key,page);
 }
 
     public Page<Coach> findByRate(int x, Pageable page) {

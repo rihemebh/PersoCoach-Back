@@ -74,23 +74,15 @@ public class CoachController {
 //
 //     }
 
-        if (key.isEmpty()) {
+
             if (direction.orElse(0) == 1) {
                 return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
-                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
+                        key.orElse(""), PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
             } else {
                 return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
-                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
+                        key.orElse(""), PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
             }
-        } else {
-            if (direction.orElse(0) == 1) {
-                return repository.findByNameOrType(key.orElse(""),
-                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
-            } else {
-                return repository.findByNameOrType(key.orElse(""),
-                        PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
-            }
-        }
+
 
     }
 
@@ -109,11 +101,12 @@ public class CoachController {
         return repository.findById(id);
    }
     @RequestMapping(value="/coachesNb",method= RequestMethod.GET)
-    public int getNbCoaches(@RequestParam("type") Optional<String> type ,
+    public int getNbCoaches(@RequestParam("key") Optional<String> key ,
+                            @RequestParam("type") Optional<String> type ,
                             @RequestParam("rate") Optional<Integer> rate ,
                             @RequestParam("gender") Optional<String> gender ){
 
-        return repository.getNbCoaches(rate.orElse(5), type.orElse(""), gender.orElse(""));
+        return repository.getNbCoaches(key.orElse(""),rate.orElse(5), type.orElse(""), gender.orElse(""));
     }
 
   @RequestMapping(value="/coach/delete/{id}", method=RequestMethod.DELETE)
