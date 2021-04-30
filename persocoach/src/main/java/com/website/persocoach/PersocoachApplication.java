@@ -20,44 +20,44 @@ public class PersocoachApplication {
         SpringApplication.run(PersocoachApplication.class, args);
     }
 
-    @Bean
+   /* @Bean
     public CommandLineRunner init(CoachRepository repo) {
 
         return args -> {
-//
-//            String[] genders = new String[2];
-//            genders[0] = "Women";
-//            genders[1] = "Men";
-//            String[] types = new String[2];
-//            types[0] = "Sport";
-//            types[1] = "Nutrition";
-//            Faker faker = new Faker();
-//            ArrayList<String> acadamicExp = new ArrayList<>();
-//            ArrayList<String> workExp = new ArrayList<>();
-//            ArrayList<String> reviews = new ArrayList<>();
-//
-//            for (int i = 0; i <5; i++) {
-//                Coach c = new Coach();
-//                c.setName(faker.name().fullName());
-//                c.setType(types[i%2]);
-//                c.setId(faker.idNumber().toString());
-//                c.setGender(genders[(4-i) % 2]);
-//                c.setUrl(faker.internet().image());
-//                c.setDescription(faker.lorem().paragraph());
-//                acadamicExp.add(faker.lorem().sentence());
-//                acadamicExp.add(faker.lorem().sentence());
-//                workExp.add(faker.lorem().sentence());
-//                workExp.add(faker.lorem().sentence());
-//                c.setRate(faker.number().numberBetween(0, 5));
-//                reviews.add(faker.lorem().sentence());
-//                c.setWorkExp(workExp);
-//                c.setAcadamicExp(acadamicExp);
-//                c.setReviews(reviews);
-//                repo.save(c);
-//
-//            }
+
+            String[] genders = new String[2];
+            genders[0] = "Women";
+            genders[1] = "Men";
+            String[] types = new String[2];
+            types[0] = "Sport";
+            types[1] = "Nutrition";
+            Faker faker = new Faker();
+            ArrayList<String> acadamicExp = new ArrayList<>();
+            ArrayList<String> workExp = new ArrayList<>();
+            ArrayList<String> reviews = new ArrayList<>();
+
+
+                Coach c = new Coach();
+                c.setName(faker.name().fullName());
+                c.setType(types[1]);
+                c.setId(faker.idNumber().toString());
+                c.setGender(genders[1]);
+                c.setUrl(faker.internet().image());
+                c.setDescription(faker.lorem().paragraph());
+                acadamicExp.add(faker.lorem().sentence());
+                acadamicExp.add(faker.lorem().sentence());
+                workExp.add(faker.lorem().sentence());
+                workExp.add(faker.lorem().sentence());
+                c.setRate(5);
+                reviews.add(faker.lorem().sentence());
+                c.setWorkExp(workExp);
+                c.setAcadamicExp(acadamicExp);
+                c.setReviews(reviews);
+                repo.save(c);
+
+
 
 
         };
-    }
+    }*/
 }
