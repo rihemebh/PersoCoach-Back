@@ -43,7 +43,6 @@ public class CoachController {
                             @RequestParam Optional<Double> weight,
                             @RequestParam Optional<File> pic,
                             @RequestParam String practice
-
     ) {
         Coach coach = repository.findById(id);
         Client client = new Client();
@@ -60,42 +59,7 @@ public class CoachController {
                                @RequestParam("sort") Optional<String> sort,
                                @RequestParam("direction") Optional<Integer> direction,
                                @RequestParam("page") Optional<Integer> page) {
-//        String[] genders = new String[2];
-//        genders[0] = "Women";
-//        genders[1] = "Men";
-//        String[] types = new String[2];
-//        types[0] = "Sport";
-//        types[1] = "Nutrition";
-//        Faker faker = new Faker();
-//        ArrayList<String> acadamicExp = new ArrayList<>();
-//        ArrayList<String> workExp = new ArrayList<>();
-//        ArrayList<String> reviews = new ArrayList<>();
-//
-//            Coach c = new Coach();
-//            c.setName(faker.name().fullName());
-//            c.setType(types[faker.number().numberBetween(0, 2)]);
-//            c.setId(faker.idNumber().toString());
-//            c.setGender(genders[faker.number().numberBetween(0, 2)]);
-//            c.setUrl(faker.internet().image());
-//            c.setDescription(faker.lorem().paragraph());
-//            acadamicExp.add(faker.lorem().sentence());
-//            acadamicExp.add(faker.lorem().sentence());
-//            workExp.add(faker.lorem().sentence());
-//            workExp.add(faker.lorem().sentence());
-//            c.setRate(faker.number().numberBetween(0, 6));
-//            reviews.add(faker.lorem().sentence());
-//            c.setWorkExp(workExp);
-//            c.setAcadamicExp(acadamicExp);
-//            c.setReviews(reviews);
-//            repository.save(c);
-//        if (direction.orElse(0) == 1) {
-//            return repository.findByName(name.orElse(""), PageRequest.of(page.orElse(0), 8,
-//                    Sort.by(sort.orElse("rate")).ascending()));
-//        } else {
-//            return repository.findByName(name.orElse(""), PageRequest.of(page.orElse(0), 8,
-//                    Sort.by(sort.orElse("rate")).descending()));
-//
-//     }
+
         if (direction.orElse(0) == 1) {
             return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
                     key.orElse(""),
