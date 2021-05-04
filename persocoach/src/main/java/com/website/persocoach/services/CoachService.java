@@ -1,6 +1,5 @@
-package com.website.persocoach.Services;
+package com.website.persocoach.services;
 import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.repositories.CoachRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
