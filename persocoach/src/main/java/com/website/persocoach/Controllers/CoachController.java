@@ -15,16 +15,8 @@ import java.util.Collection;
 @RequestMapping("/catalog")
 public class CoachController {
 
-    @Autowired
-    private final CoachRepository repository;
+    @Autowired private CoachRepository repository;
 
-    CoachController (CoachRepository repo){
-        super();
-
-        this.repository=repo;
-        repository.deleteById("0");
-
-    }
     @RequestMapping(value="/coaches",method = RequestMethod.GET)
     public Collection<Coach> coaches() {
         return repository.findAll();
