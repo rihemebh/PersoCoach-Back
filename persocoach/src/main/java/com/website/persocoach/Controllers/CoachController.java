@@ -23,7 +23,6 @@ import java.util.Optional;
 @RequestMapping("/catalog")
 public class CoachController {
 
-
     private final CoachService repository;
     private final RequestService service;
     Collection<Coach> coaches = new ArrayList<>();
@@ -78,6 +77,7 @@ public class CoachController {
         return repository.findById(id);
     }
 
+
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
     public int getNbCoaches(@RequestParam("key") Optional<String> key,
                             @RequestParam("type") Optional<String> type,
@@ -99,8 +99,6 @@ public class CoachController {
         repository.saveCoach(c);
         return ResponseEntity.ok().body(c);
     }
-
-
 
     @RequestMapping(value = "/coach/add", method = RequestMethod.PUT)
     public ResponseEntity<Coach> addCoach(Coach c) throws URISyntaxException {
