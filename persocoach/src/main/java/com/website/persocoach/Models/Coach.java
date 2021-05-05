@@ -29,16 +29,14 @@ public class Coach implements Serializable {
     @Field(value = "gender")
     private String gender;
     private String url;
-    @Field(value = "desriptio,")
+    @Field(value = "desription")
     private String description;
-    @Field(value = "acadamic_Exp")
+    @Field(value = "acadamicExp")
     private ArrayList<String> acadamicExp = new ArrayList<>();
-    @Field(value = "work_Exp")
+    @Field(value = "workExp")
     private ArrayList<String> workExp = new ArrayList<>();
     @Field(value = "rate")
     private int rate;
-    @Field(value = "reviews")
-    private ArrayList<String> reviews = new ArrayList<>();
 
 
 }

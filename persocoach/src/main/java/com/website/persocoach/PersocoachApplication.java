@@ -20,7 +20,7 @@ public class PersocoachApplication {
         SpringApplication.run(PersocoachApplication.class, args);
     }
 
-   /* @Bean
+   @Bean
     public CommandLineRunner init(CoachRepository repo) {
 
         return args -> {
@@ -36,10 +36,9 @@ public class PersocoachApplication {
             ArrayList<String> workExp = new ArrayList<>();
             ArrayList<String> reviews = new ArrayList<>();
 
-
                 Coach c = new Coach();
                 c.setName(faker.name().fullName());
-                c.setType(types[1]);
+                c.setType(types[0]);
                 c.setId(faker.idNumber().toString());
                 c.setGender(genders[1]);
                 c.setUrl(faker.internet().image());
@@ -52,12 +51,12 @@ public class PersocoachApplication {
                 reviews.add(faker.lorem().sentence());
                 c.setWorkExp(workExp);
                 c.setAcadamicExp(acadamicExp);
-                c.setReviews(reviews);
+
                 repo.save(c);
 
 
 
 
         };
-    }*/
+    }
 }

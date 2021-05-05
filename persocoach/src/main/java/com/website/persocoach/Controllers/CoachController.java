@@ -5,6 +5,7 @@ import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.services.CoachService;
 import com.website.persocoach.services.RequestService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,33 +23,19 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/catalog")
 public class CoachController {
+    @Autowired
+    CoachService repository;
+    @Autowired
+    RequestService service;
 
-    private final CoachService repository;
-    private final RequestService service;
     Collection<Coach> coaches = new ArrayList<>();
 
-    CoachController(CoachService repository, RequestService service) {
+    /*CoachController(CoachService repository, RequestService service) {
         super();
         this.repository = repository;
         this.service = service;
-    }
+    }*/
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable String id,
-                            @RequestParam Optional<String> gender,
-                            @RequestParam String goal,
-                            @RequestParam Optional<Integer> age,
-                            @RequestParam Optional<Double> height,
-                            @RequestParam Optional<Double> weight,
-                            @RequestParam Optional<File> pic,
-                            @RequestParam String practice
-    ) {
-        Coach coach = repository.findById(id);
-        Client client = new Client();
-        service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-                weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-                age.orElse(client.getAge()),goal,pic.orElse(null)));
-    }
 
     @RequestMapping(value = "/coaches", method = RequestMethod.GET)
     public Page<Coach> coaches(@RequestParam("key") Optional<String> key,
@@ -75,6 +62,22 @@ public class CoachController {
     public Coach getCoach(@PathVariable String id) {
 
         return repository.findById(id);
+    }
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
+    public void saveRequest(@PathVariable String id,
+                            @RequestParam Optional<String> gender,
+                            @RequestParam String goal,
+                            @RequestParam Optional<Integer> age,
+                            @RequestParam Optional<Double> height,
+                            @RequestParam Optional<Double> weight,
+                            @RequestParam Optional<File> pic,
+                            @RequestParam String practice
+    ) {
+        Coach coach = repository.findById(id);
+        Client client = new Client();
+        service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
+                weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
+                age.orElse(client.getAge()),goal,pic.orElse(null)));
     }
 
 
