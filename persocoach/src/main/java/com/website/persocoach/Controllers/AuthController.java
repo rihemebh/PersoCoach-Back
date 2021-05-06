@@ -1,6 +1,5 @@
 package com.website.persocoach.Controllers;
 
-
 import com.website.persocoach.Models.AuthenticationRequest;
 import com.website.persocoach.Models.User;
 import com.website.persocoach.repositories.UserRepository;

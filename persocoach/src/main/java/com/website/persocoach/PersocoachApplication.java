@@ -40,23 +40,19 @@ public class PersocoachApplication {
                 c.setName(faker.name().fullName());
                 c.setType(types[0]);
                 c.setId(faker.idNumber().toString());
-                c.setGender(genders[1]);
+                c.setGender(genders[0]);
                 c.setUrl(faker.internet().image());
                 c.setDescription(faker.lorem().paragraph());
                 acadamicExp.add(faker.lorem().sentence());
                 acadamicExp.add(faker.lorem().sentence());
                 workExp.add(faker.lorem().sentence());
                 workExp.add(faker.lorem().sentence());
-                c.setRate(5);
+                c.setRate(3);
                 reviews.add(faker.lorem().sentence());
                 c.setWorkExp(workExp);
                 c.setAcadamicExp(acadamicExp);
 
                 repo.save(c);
-
-
-
-
         };
     }
 }
