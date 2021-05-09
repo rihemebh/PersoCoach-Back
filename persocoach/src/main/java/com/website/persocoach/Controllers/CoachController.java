@@ -85,48 +85,7 @@ public class CoachController {
                 weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
                 age.orElse(client.getAge()),goal,pic.orElse(null)));
     }
-    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
-    public void saveReview(@PathVariable String id,@RequestParam String desc,@RequestParam int rate){
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Client client;
-       /* if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
-        {
-            if(auth.getDetails() !=null)
-                System.out.println(auth.getDetails().getClass());
-            if( auth.getDetails() instanceof UserDetails)
-            {
-                System.out.println("UserDetails");
-                 client = (Client) auth;
-            }
-            else
-            {
-                System.out.println("!UserDetails");
-            }
-        }*/
-       if (!(auth instanceof AnonymousAuthenticationToken))
-            client = (Client) auth ;
-            client = new Client();
-        ReviewRepo.save(new Review(client,repository.findById(id),desc,rate,new Date(System.currentTimeMillis())));
-    }
-    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
-    public List<Review> getCoachesReview(@PathVariable String id){
-        Coach coach = repository.findById(id);
 
-        return ReviewRepo.findAllByCoach(coach);
-    }
-
-    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Review> updateReview(@RequestBody Review  review){
-       //Review review = ReviewRepo.findById(id).orElse(null);
-        Review r = ReviewRepo.save(review);
-        return ResponseEntity.ok().body(r);
-    }
-
-    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteReview(@PathVariable String id) {
-        ReviewRepo.deleteById(id);
-        return ResponseEntity.ok().build();
-    }
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
     public int getNbCoaches(@RequestParam("key") Optional<String> key,
                             @RequestParam("type") Optional<String> type,
@@ -151,11 +110,58 @@ public class CoachController {
 
     @RequestMapping(value = "/coach/add", method = RequestMethod.PUT)
     public ResponseEntity<Coach> addCoach(Coach c) throws URISyntaxException {
+
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
 
 
     }
 
+
+ /******* Reviews ********/
+
+
+ @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
+ public void saveReview(@PathVariable String id,@RequestParam Optional<String> desc,@RequestParam int rate){
+     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+     Client client;
+       /* if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
+        {
+            if(auth.getDetails() !=null)
+                System.out.println(auth.getDetails().getClass());
+            if( auth.getDetails() instanceof UserDetails)
+            {
+                System.out.println("UserDetails");
+                 client = (Client) auth;
+            }
+            else
+            {
+                System.out.println("!UserDetails");
+            }
+        }*/
+     if (!(auth instanceof AnonymousAuthenticationToken))
+         client = (Client) auth ;
+     client = new Client();
+     ReviewRepo.save(new Review(client,repository.findById(id), desc.orElse(""), rate,new Date(System.currentTimeMillis())));
+ }
+    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
+    public List<Review> getCoachesReview(@PathVariable String id){
+        Coach coach = repository.findById(id);
+
+        return ReviewRepo.findAllByCoach(coach);
+    }
+
+    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Review> updateReview(@RequestBody Review  review){
+        //Review review = ReviewRepo.findById(id).orElse(null);
+        Review r = ReviewRepo.save(review);
+        return ResponseEntity.ok().body(r);
+    }
+
+    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteReview(@PathVariable String id) {
+        ReviewRepo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
 }
