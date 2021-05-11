@@ -1,4 +1,4 @@
-package com.website.persocoach.Models;
+package com.website.persocoach.payload.request;
 
 public class AuthenticationRequest {
 

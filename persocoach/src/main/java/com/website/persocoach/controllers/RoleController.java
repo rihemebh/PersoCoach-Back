@@ -1,4 +1,4 @@
-package com.website.persocoach.Controllers;
+package com.website.persocoach.controllers;
 
 
 import com.website.persocoach.Models.Role;

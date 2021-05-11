@@ -1,4 +1,4 @@
-package com.website.persocoach.services;
+package com.website.persocoach.security.services;
 
 import com.website.persocoach.Models.User;
 import org.springframework.security.core.GrantedAuthority;

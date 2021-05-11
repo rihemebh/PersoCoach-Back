@@ -1,7 +1,7 @@
-package com.website.persocoach.Config;
+package com.website.persocoach.config;
 
-import com.website.persocoach.services.JwtFilterRequest;
-import com.website.persocoach.services.UserDetailsServiceImpl;
+import com.website.persocoach.security.jwt.JwtFilterRequest;
+import com.website.persocoach.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,9 +1,9 @@
-package com.website.persocoach.Controllers;
+package com.website.persocoach.controllers;
 
 
 import com.website.persocoach.Models.User;
 import com.website.persocoach.repositories.UserRepository;
-import com.website.persocoach.services.UserDetailsServiceImpl;
+import com.website.persocoach.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

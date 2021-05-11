@@ -1,4 +1,4 @@
-package com.website.persocoach.services;
+package com.website.persocoach.security.services;
 
 import com.website.persocoach.Models.User;
 import com.website.persocoach.repositories.UserRepository;
@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
