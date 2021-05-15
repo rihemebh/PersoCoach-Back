@@ -15,11 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,25 +37,25 @@ public class AuthController {
 
 
     @PostMapping("/sign-in")
+    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest){
         Authentication auth = null;
-
         try{
-             auth = authenticationManager.authenticate(
+            UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsServiceImpl.loadUserByUsername(authenticationRequest.getUsername());
+        }catch(UsernameNotFoundException notFoundException){
+            return new ResponseEntity<String>("User does not exist !", HttpStatus.BAD_REQUEST);
+        }
+        try{
+            auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
             );
         }catch (BadCredentialsException badCredentialsException){
-            return new ResponseEntity<String>("bad credentials", HttpStatus.BAD_REQUEST);
-        }catch (DisabledException disabledException){
-            return new ResponseEntity<String>("disabled", HttpStatus.BAD_REQUEST);
-        }catch (LockedException lockedException){
-            return new ResponseEntity<String>("locked", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>("Incorrect Password", HttpStatus.BAD_REQUEST);
         }catch (Exception e){
             return new ResponseEntity<String>("error authenticating", HttpStatus.BAD_REQUEST);
         }
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsServiceImpl.loadUserByUsername(authenticationRequest.getUsername());
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         //UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
         String jwt = jwtUtils.generateToken(userDetails);
@@ -71,10 +69,10 @@ public class AuthController {
                 userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles));
-
     }
 
     @PostMapping("/sign-up")
+    @CrossOrigin(origins = "http://localhost:3000")
     private ResponseEntity<?> createUser(@RequestBody AuthenticationRequest authenticationRequest){
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();
@@ -99,7 +97,7 @@ public class AuthController {
         }catch(Exception e){
             return new ResponseEntity<String>("error while creating user", HttpStatus.BAD_GATEWAY);
         }
-        return new ResponseEntity<String>("user has been successfully signed up", HttpStatus.OK);
+        return new ResponseEntity<String>("user has been successfully signed up", HttpStatus.CREATED);
 
     }
 }
