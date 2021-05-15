@@ -7,38 +7,27 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "coach")
-public class Coach implements Serializable {
+@Document(collection = "client")
+public class Client implements Serializable {
 
-    @MongoId
+    @Id
     @Generated
     private String id;
     @Field(value = "name")
     private String name;
-    @Field(value = "type")
-    private String type;
+    private Integer age;
     @Field(value = "gender")
     private String gender;
     private String url;
-    @Field(value = "desriptio,")
+    private Double weight;
+    private Double height;
+    @Field(value = "desription")
     private String description;
-    @Field(value = "acadamic_Exp")
-    private ArrayList<String> acadamicExp = new ArrayList<>();
-    @Field(value = "work_Exp")
-    private ArrayList<String> workExp = new ArrayList<>();
-    @Field(value = "rate")
-    private int rate;
-    @Field(value = "reviews")
-    private ArrayList<String> reviews = new ArrayList<>();
-
 
 }
