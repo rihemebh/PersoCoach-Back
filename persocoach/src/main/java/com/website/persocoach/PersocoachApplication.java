@@ -1,4 +1,4 @@
-package com.website.persocoach;
+gpackage com.website.persocoach;
 
 import com.github.javafaker.Faker;
 import com.website.persocoach.Models.Coach;
@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Bean;
 import java.util.ArrayList;
 
 @SpringBootApplication
+
 public class PersocoachApplication {
+
     @Autowired
     CoachRepository repo;
 
@@ -20,7 +22,7 @@ public class PersocoachApplication {
         SpringApplication.run(PersocoachApplication.class, args);
     }
 
-   /* @Bean
+    @Bean
     public CommandLineRunner init(CoachRepository repo) {
 
         return args -> {
@@ -58,6 +60,7 @@ public class PersocoachApplication {
 
 
 
+
         };
-    }*/
+    }
 }
