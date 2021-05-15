@@ -1,6 +1,5 @@
 package com.website.persocoach.Models;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -18,6 +17,10 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+    public User(String username) {
+        this.username = username;
+
     }
 
     public String getUsername() {

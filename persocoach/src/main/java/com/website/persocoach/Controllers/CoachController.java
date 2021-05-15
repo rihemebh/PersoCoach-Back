@@ -80,7 +80,16 @@ public class CoachController {
                             @RequestParam String practice
     ) {
         Coach coach = repository.findById(id);
-        Client client = new Client();
+        Client client;
+        // = new Client();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            client = (Client) ((UserDetails)principal);
+        } else { client = new Client();
+            String username = principal.toString();
+            System.out.println(username);
+        }
         service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
                 weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
                 age.orElse(client.getAge()),goal,pic.orElse(null)));

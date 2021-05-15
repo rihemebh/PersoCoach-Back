@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 @SpringBootApplication
 public class PersocoachApplication {
@@ -24,7 +25,8 @@ public class PersocoachApplication {
     public CommandLineRunner init(CoachRepository repo) {
 
         return args -> {
-
+            Random rand = new Random();
+            int randomNum = (int) (Math.random() * (2));
             String[] genders = new String[2];
             genders[0] = "Women";
             genders[1] = "Men";
@@ -38,9 +40,9 @@ public class PersocoachApplication {
 
                 Coach c = new Coach();
                 c.setName(faker.name().fullName());
-                c.setType(types[0]);
-                c.setId(faker.idNumber().toString());
-                c.setGender(genders[0]);
+                c.setType(types[randomNum]);
+                //c.setId(faker.idNumber().toString());
+                c.setGender(genders[randomNum]);
                 c.setUrl(faker.internet().image());
                 c.setDescription(faker.lorem().paragraph());
                 acadamicExp.add(faker.lorem().sentence());
