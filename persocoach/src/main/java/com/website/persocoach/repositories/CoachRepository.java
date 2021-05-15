@@ -15,10 +15,6 @@ public interface CoachRepository extends MongoRepository<Coach, String>, PagingA
 
     @Query("{ $or: [ { 'name' : /?0/ } , { 'type' : /?0/ } ] }")
     Page<Coach> findAllByNameOrType(String key, Pageable page);
-
-   /* @Query("{ $or: [ { 'name' : /?0/ } , { 'type' : /?0/ } ] }")
-    List<Coach> findAllByNameOrType(String key);*/
-
     @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/  ," +
             "$or: [ { 'name' : { $regex : new RegExp(?3,'i') } } , { 'description' : { $regex : new RegExp(?3,'i') } } ]  }")
     Page<Coach> findAllByRateTOrTypeOrGenderOrName(int rate, String type, String gender, String key, Pageable page);
@@ -26,6 +22,5 @@ public interface CoachRepository extends MongoRepository<Coach, String>, PagingA
             "$or: [ { 'name' : { $regex : new RegExp(?3,'i') } } , { 'description' : { $regex : new RegExp(?3,'i') } } ]  }")
     List<Coach> findAllByRateTOrTypeOrGenderOrName(int rate, String type, String gender,String key);
 
-  //  Page<Coach> findAllByType(String type, Pageable page);
 
 }

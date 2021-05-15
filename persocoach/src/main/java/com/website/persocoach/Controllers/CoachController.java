@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -81,15 +78,9 @@ public class CoachController {
     ) {
         Coach coach = repository.findById(id);
         Client client;
-        // = new Client();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        client = (Client) principal;
 
-        if (principal instanceof UserDetails) {
-            client = (Client) ((UserDetails)principal);
-        } else { client = new Client();
-            String username = principal.toString();
-            System.out.println(username);
-        }
         service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
                 weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
                 age.orElse(client.getAge()),goal,pic.orElse(null)));
@@ -132,26 +123,17 @@ public class CoachController {
 
  @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
  public void saveReview(@PathVariable String id,@RequestParam Optional<String> desc,@RequestParam int rate){
-     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
      Client client;
-       /* if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
-        {
-            if(auth.getDetails() !=null)
-                System.out.println(auth.getDetails().getClass());
-            if( auth.getDetails() instanceof UserDetails)
-            {
-                System.out.println("UserDetails");
-                 client = (Client) auth;
-            }
-            else
-            {
-                System.out.println("!UserDetails");
-            }
-        }*/
-     if (!(auth instanceof AnonymousAuthenticationToken))
-         client = (Client) auth ;
-     client = new Client();
-     ReviewRepo.save(new Review(client,repository.findById(id), desc.orElse(""), rate,new Date(System.currentTimeMillis())));
+     Coach coach= repository.findById(id);
+     List<Review> reviews = ReviewRepo.findAll();
+     double r=rate;
+     for(int i=0; i< reviews.size();i++){
+         r+=reviews.get(i).getRate();
+     }
+     coach.setRate( (int) (r/ (reviews.size()+1)));
+     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+     client = (Client) principal;
+     ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
  }
     @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
     public List<Review> getCoachesReview(@PathVariable String id){
