@@ -1,9 +1,10 @@
-package com.website.persocoach.Models;
+package com.website.persocoach.payload.request;
 
 public class AuthenticationRequest {
 
     private String username;
     private String password;
+    private String email;
 
     public AuthenticationRequest() {
     }
@@ -22,5 +23,13 @@ public class AuthenticationRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
