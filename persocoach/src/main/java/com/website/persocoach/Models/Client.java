@@ -15,8 +15,7 @@ import java.io.Serializable;
 public class Client extends User implements Serializable {
 
 
-    @Id
-    private String id;
+
     private String name;
     private Integer age;
     private String gender;
