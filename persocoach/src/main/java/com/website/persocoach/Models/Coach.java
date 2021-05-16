@@ -2,12 +2,10 @@ package com.website.persocoach.Models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,10 +15,11 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "coach")
-public class Coach implements Serializable {
+public class Coach extends User implements Serializable {
 
-    @MongoId
-    @Generated
+
+
+    @Id
     private String id;
     @Field(value = "name")
     private String name;
@@ -29,16 +28,14 @@ public class Coach implements Serializable {
     @Field(value = "gender")
     private String gender;
     private String url;
-    @Field(value = "desriptio,")
+    @Field(value = "desription")
     private String description;
-    @Field(value = "acadamic_Exp")
+    @Field(value = "acadamicExp")
     private ArrayList<String> acadamicExp = new ArrayList<>();
-    @Field(value = "work_Exp")
+    @Field(value = "workExp")
     private ArrayList<String> workExp = new ArrayList<>();
     @Field(value = "rate")
     private int rate;
-    @Field(value = "reviews")
-    private ArrayList<String> reviews = new ArrayList<>();
 
 
 }
