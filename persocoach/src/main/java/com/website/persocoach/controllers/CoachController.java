@@ -3,21 +3,24 @@ package com.website.persocoach.controllers;
 import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
+import com.website.persocoach.Models.Review;
+import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.ReviewRepository;
 import com.website.persocoach.services.CoachService;
 import com.website.persocoach.services.RequestService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/catalog")
@@ -25,8 +28,13 @@ import java.util.Optional;
 
 public class CoachController {
 
-    private final CoachService repository;
-    private final RequestService service;
+    CoachService repository;
+    @Autowired
+    CoachRepository repo;
+    RequestService service;
+    @Autowired
+    ReviewRepository ReviewRepo;
+
     Collection<Coach> coaches = new ArrayList<>();
 
     CoachController(CoachService repository, RequestService service) {
@@ -35,22 +43,6 @@ public class CoachController {
         this.service = service;
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable String id,
-                            @RequestParam Optional<String> gender,
-                            @RequestParam String goal,
-                            @RequestParam Optional<Integer> age,
-                            @RequestParam Optional<Double> height,
-                            @RequestParam Optional<Double> weight,
-                            @RequestParam Optional<File> pic,
-                            @RequestParam String practice
-    ) {
-        Coach coach = repository.findById(id);
-        Client client = new Client();
-        service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-                weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-                age.orElse(client.getAge()),goal,pic.orElse(null)));
-    }
 
     @RequestMapping(value = "/coaches", method = RequestMethod.GET)
     public Page<Coach> coaches(@RequestParam("key") Optional<String> key,
@@ -64,21 +56,46 @@ public class CoachController {
         if (direction.orElse(0) == 1) {
             return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
                     key.orElse(""),
-                    PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).ascending()));
+                    PageRequest.of(page.orElse(0), 9, Sort.by(sort.orElse("rate")).ascending()));
         } else {
             return repository.findByRateTypeGender(rate.orElse(5), type.orElse(""), gender.orElse(""),
                     key.orElse(""),
-                    PageRequest.of(page.orElse(0), 8, Sort.by(sort.orElse("rate")).descending()));
+                    PageRequest.of(page.orElse(0), 9, Sort.by(sort.orElse("rate")).descending()));
         }
 
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.GET)
-    public Coach getCoach(@PathVariable String id) {
+    @RequestMapping(value ="/coach/{id}", method = RequestMethod.GET)
+    public Optional<Coach> getCoach(@PathVariable String id) {
 
-        return repository.findById(id);
+        return repo.findById(id);
     }
 
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
+    public void saveRequest(@PathVariable  String id,
+                            @RequestParam Optional<String> gender,
+                            @RequestParam String goal,
+                            @RequestParam Optional<Integer> age,
+                            @RequestParam Optional<Double> height,
+                            @RequestParam Optional<Double> weight,
+                            @RequestParam Optional<File> pic,
+                            @RequestParam String practice
+    ) {
+        Coach coach = repo.findById(id).orElse(null);
+        Client client;
+        try{
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            client = (Client) principal;
+        ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
+        weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
+        age.orElse(client.getAge()),goal,pic.orElse(null));
+            service.addRequest(prog);
+            System.out.println("Request saved" + prog);
+        }catch(Exception e ){
+
+        }
+
+    }
 
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
     public int getNbCoaches(@RequestParam("key") Optional<String> key,
@@ -91,8 +108,8 @@ public class CoachController {
     }
 
     @RequestMapping(value = "/coach/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteCoach(@PathVariable String id) {
-        repository.deleteById(id);
+    public ResponseEntity<?> deleteCoach(@PathVariable String  id) {
+        repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
@@ -104,11 +121,74 @@ public class CoachController {
 
     @RequestMapping(value = "/coach/add", method = RequestMethod.PUT)
     public ResponseEntity<Coach> addCoach(Coach c) throws URISyntaxException {
+
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
 
 
     }
 
+
+ /******* Reviews ********/
+
+
+ @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
+ public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
+     Client client;
+     Coach coach= repo.findById(id).orElse(null);
+     List<Review> reviews = ReviewRepo.findAllByCoach(coach);
+     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+     double r=rate;
+     try{
+         if (reviews.size() > 0) {
+             for(int i=0; i< reviews.size() ;i++){
+                 r+= reviews.get(i).getRate();
+
+
+             }
+             coach.setRate( (int) ((r/reviews.size() +1) % 5));
+             for(int i=0; i< reviews.size() ;i++){
+                reviews.get(i).getCoach().setRate(coach.getRate());
+                 ReviewRepo.save(reviews.get(i));
+
+             }
+         }else{
+             coach.setRate(rate);
+         }
+     }catch(Exception e){
+         System.out.println(coach);
+         System.out.println(e);
+     }
+
+     repository.saveCoach(coach);
+     client = new Client(principal.toString());
+     try {
+         client = (Client) principal;
+
+     }catch(Exception e){
+         System.out.println(e);
+
+     }
+     ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
+ }
+    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
+    public List<Review> getCoachesReview(@PathVariable String id){
+        Optional<Coach> coach = repo.findById(id);
+
+        return ReviewRepo.findAllByCoach(coach.orElse(null));
+    }
+
+    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Review> updateReview(@RequestBody Review  review){
+        //Review review = ReviewRepo.findById(id).orElse(null);
+        Review r = ReviewRepo.save(review);
+        return ResponseEntity.ok().body(r);
+    }
+
+    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteReview(@PathVariable String  id) {
+        ReviewRepo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
 }
