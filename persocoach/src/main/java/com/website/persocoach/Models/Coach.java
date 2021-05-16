@@ -19,8 +19,7 @@ public class Coach extends User implements Serializable {
 
 
 
-    @Id
-    private String id;
+
     @Field(value = "name")
     private String name;
     @Field(value = "type")
