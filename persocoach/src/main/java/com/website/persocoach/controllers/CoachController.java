@@ -135,21 +135,23 @@ public class CoachController {
  @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
  public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
      Client client;
-
-
-     Coach coach= repo.findById(
-             id
-     ).orElse(null);
+     Coach coach= repo.findById(id).orElse(null);
      List<Review> reviews = ReviewRepo.findAllByCoach(coach);
      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
      double r=rate;
      try{
          if (reviews.size() > 0) {
-             for(int i=0; i< 3;i++){
+             for(int i=0; i< reviews.size() ;i++){
                  r+= reviews.get(i).getRate();
 
+
              }
-             coach.setRate( (int) (r/4));
+             coach.setRate( (int) ((r/reviews.size() +1) % 5));
+             for(int i=0; i< reviews.size() ;i++){
+                reviews.get(i).getCoach().setRate(coach.getRate());
+                 ReviewRepo.save(reviews.get(i));
+
+             }
          }else{
              coach.setRate(rate);
          }
