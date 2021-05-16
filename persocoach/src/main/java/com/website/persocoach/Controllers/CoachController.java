@@ -4,6 +4,7 @@ import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.Models.Review;
+import com.website.persocoach.repositories.CoachRepository;
 import com.website.persocoach.repositories.ReviewRepository;
 import com.website.persocoach.services.CoachService;
 import com.website.persocoach.services.RequestService;
@@ -26,7 +27,8 @@ import java.util.*;
 public class CoachController {
 
     CoachService repository;
-
+    @Autowired
+    CoachRepository repo;
     RequestService service;
     @Autowired
     ReviewRepository ReviewRepo;
@@ -61,13 +63,14 @@ public class CoachController {
 
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.GET)
-    public Coach getCoach(@PathVariable String id) {
+    @RequestMapping(value ="/coach/{id}", method = RequestMethod.GET)
+    public Optional<Coach> getCoach(@PathVariable String id) {
 
-        return repository.findById(id);
+        return repo.findById(id);
     }
+
     @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable String id,
+    public void saveRequest(@PathVariable  String id,
                             @RequestParam Optional<String> gender,
                             @RequestParam String goal,
                             @RequestParam Optional<Integer> age,
@@ -76,14 +79,20 @@ public class CoachController {
                             @RequestParam Optional<File> pic,
                             @RequestParam String practice
     ) {
-        Coach coach = repository.findById(id);
+        Coach coach = repo.findById(id).orElse(null);
         Client client;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        client = (Client) principal;
+        try{
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            client = (Client) principal;
+        ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
+        weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
+        age.orElse(client.getAge()),goal,pic.orElse(null));
+            service.addRequest(prog);
+            System.out.println("Request saved" + prog);
+        }catch(Exception e ){
 
-        service.addRequest(new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-                weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-                age.orElse(client.getAge()),goal,pic.orElse(null)));
+        }
+
     }
 
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
@@ -97,8 +106,8 @@ public class CoachController {
     }
 
     @RequestMapping(value = "/coach/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteCoach(@PathVariable String id) {
-        repository.deleteById(id);
+    public ResponseEntity<?> deleteCoach(@PathVariable String  id) {
+        repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
@@ -122,24 +131,47 @@ public class CoachController {
 
 
  @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
- public void saveReview(@PathVariable String id,@RequestParam Optional<String> desc,@RequestParam int rate){
+ public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
      Client client;
-     Coach coach= repository.findById(id);
-     List<Review> reviews = ReviewRepo.findAll();
-     double r=rate;
-     for(int i=0; i< reviews.size();i++){
-         r+=reviews.get(i).getRate();
-     }
-     coach.setRate( (int) (r/ (reviews.size()+1)));
+
+
+     Coach coach= repo.findById(
+             id
+     ).orElse(null);
+     List<Review> reviews = ReviewRepo.findAllByCoach(coach);
      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-     client = (Client) principal;
+     double r=rate;
+     try{
+         if (reviews.size() > 0) {
+             for(int i=0; i< 3;i++){
+                 r+= reviews.get(i).getRate();
+
+             }
+             coach.setRate( (int) (r/4));
+         }else{
+             coach.setRate(rate);
+         }
+     }catch(Exception e){
+         System.out.println(coach);
+         System.out.println(e);
+     }
+
+     repository.saveCoach(coach);
+     client = new Client(principal.toString());
+     try {
+         client = (Client) principal;
+
+     }catch(Exception e){
+         System.out.println(e);
+
+     }
      ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
  }
     @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
     public List<Review> getCoachesReview(@PathVariable String id){
-        Coach coach = repository.findById(id);
+        Optional<Coach> coach = repo.findById(id);
 
-        return ReviewRepo.findAllByCoach(coach);
+        return ReviewRepo.findAllByCoach(coach.orElse(null));
     }
 
     @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
@@ -150,7 +182,7 @@ public class CoachController {
     }
 
     @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteReview(@PathVariable String id) {
+    public ResponseEntity<?> deleteReview(@PathVariable String  id) {
         ReviewRepo.deleteById(id);
         return ResponseEntity.ok().build();
     }

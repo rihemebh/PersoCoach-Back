@@ -2,10 +2,9 @@ package com.website.persocoach.Models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 
@@ -14,8 +13,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Document(collection="review")
 public class Review {
-    @MongoId
-    @Generated
+    @Id
+
     private String id;
     private Client client;
     private Coach coach;

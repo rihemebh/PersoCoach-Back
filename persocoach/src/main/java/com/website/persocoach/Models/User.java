@@ -1,13 +1,13 @@
 package com.website.persocoach.Models;
 
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
+@Data
 @Document(collection = "users")
 public class User {
 
-    @MongoId
-    private String id;
+
     private String username;
     private String password;
 
