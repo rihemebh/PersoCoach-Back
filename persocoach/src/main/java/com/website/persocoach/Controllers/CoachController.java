@@ -24,6 +24,8 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/catalog")
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class CoachController {
 
     CoachService repository;
