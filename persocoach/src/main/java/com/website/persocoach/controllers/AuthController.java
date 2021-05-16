@@ -30,10 +30,10 @@ public class AuthController {
 
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
-    @Autowired private AuthenticationManager authenticationManager;
-    @Autowired private UserDetailsServiceImpl userDetailsServiceImpl;
-    @Autowired private JwtUtils jwtUtils;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired(required = false) private AuthenticationManager authenticationManager;
+    @Autowired(required = false)  private UserDetailsServiceImpl userDetailsServiceImpl;
+    @Autowired(required = false)  private JwtUtils jwtUtils;
+    @Autowired(required = false)  private PasswordEncoder passwordEncoder;
 
 
     @PostMapping("/sign-in")
