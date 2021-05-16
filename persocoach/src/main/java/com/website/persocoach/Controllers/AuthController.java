@@ -3,6 +3,7 @@ package com.website.persocoach.Controllers;
 import com.website.persocoach.Models.AuthenticationRequest;
 import com.website.persocoach.Models.User;
 import com.website.persocoach.repositories.UserRepository;
+import com.website.persocoach.services.JwtUtils;
 import com.website.persocoach.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,8 @@ public class AuthController {
 
     @Autowired private UserRepository userRepository;
     @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private UserService userService;
+    @Autowired private JwtUtils jwtUtils;
 
     @PostMapping("/api/sign-in")
     private ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest){
@@ -29,7 +33,10 @@ public class AuthController {
         }catch (Exception e){
             return new ResponseEntity<String>("error authenticating", HttpStatus.BAD_GATEWAY);
         }
-        return new ResponseEntity<String>("user successfully signed in", HttpStatus.OK);
+        UserDetails currentUser = userService.loadUserByUsername(username);
+        String generatedToken = jwtUtils.generateToken(currentUser);
+        return new ResponseEntity<String>("user has been successfully signed in.\nGenerated token: "+generatedToken,
+                HttpStatus.OK);
 
     }
 

@@ -11,12 +11,14 @@ import org.springframework.context.annotation.Bean;
 import java.util.ArrayList;
 
 @SpringBootApplication
+
 public class PersocoachApplication {
 
 
     public static void main(String[] args) {
         SpringApplication.run(PersocoachApplication.class, args);
     }
+
 
    @Bean
     public CommandLineRunner init(CoachRepository repo) {
@@ -51,7 +53,11 @@ public class PersocoachApplication {
                 c.setWorkExp(workExp);
                 c.setAcadamicExp(acadamicExp);
 
+
                 repo.save(c);
+
+
+
         };
     }
 }
