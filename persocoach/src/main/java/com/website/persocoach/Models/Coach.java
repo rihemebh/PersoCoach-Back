@@ -3,7 +3,6 @@ package com.website.persocoach.Models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -16,8 +15,6 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @Document(collection = "coach")
 public class Coach extends User implements Serializable {
-
-
 
 
     @Field(value = "name")

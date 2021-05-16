@@ -2,14 +2,18 @@ package com.website.persocoach;
 
 import com.github.javafaker.Faker;
 import com.website.persocoach.Models.Coach;
+import com.website.persocoach.Models.Role;
+import com.website.persocoach.Models.RoleType;
 import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 
@@ -22,7 +26,7 @@ public class PersocoachApplication {
 
 
    @Bean
-    public CommandLineRunner init(CoachRepository repo) {
+    public CommandLineRunner init(CoachRepository repo,RoleRepository r) {
 
         return args -> {
           //  Random rand = new Random();
@@ -39,6 +43,12 @@ public class PersocoachApplication {
             ArrayList<String> reviews = new ArrayList<>();
 
                 Coach c = new Coach();
+                c.setUsername(faker.name().firstName());
+                c.setPassword("123");
+
+                Set<Role> role = new HashSet<>();
+                role.add(r.findByName(RoleType.ROLE_COACH).orElse(new Role(RoleType.ROLE_COACH)));
+                c.setRoles(role);
                 c.setName(faker.name().fullName());
                 c.setType(types[randomNum]);
                 //c.setId(new ObjectId(faker.idNumber().toString()));
