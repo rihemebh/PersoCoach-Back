@@ -1,9 +1,15 @@
 package com.website.persocoach.Models;
 
+import lombok.Data;
+
 import java.io.File;
+import java.io.Serializable;
 
-public class DailyProgram {
-
+@Data
+public class DailyProgram implements Serializable {
+    int day;
+    int week;
+    int complexity;
     String Breakfast;
     String lunch;
     String dinner;
@@ -12,4 +18,5 @@ public class DailyProgram {
     String restrictions;
     File videos;
     String activitydesritpion;
+
 }

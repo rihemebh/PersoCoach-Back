@@ -2,12 +2,11 @@ package com.website.persocoach.controllers;
 
 import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.Models.Review;
 import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.RequestRepositoriy;
 import com.website.persocoach.repositories.ReviewRepository;
-import com.website.persocoach.services.CoachService;
-import com.website.persocoach.services.RequestService;
+import com.website.persocoach.security.jwt.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,16 +30,19 @@ public class CoachController {
     CoachService repository;
     @Autowired
     CoachRepository repo;
-    RequestService service;
+
+    @Autowired
+    RequestRepositoriy Reqrepo;
     @Autowired
     ReviewRepository ReviewRepo;
 
+
     Collection<Coach> coaches = new ArrayList<>();
 
-    CoachController(CoachService repository, RequestService service) {
+    CoachController(CoachService repository) {
         super();
         this.repository = repository;
-        this.service = service;
+
     }
 
 
@@ -73,27 +75,18 @@ public class CoachController {
 
     @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
     public void saveRequest(@PathVariable  String id,
-                            @RequestParam Optional<String> gender,
+                            @RequestParam String gender,
                             @RequestParam String goal,
-                            @RequestParam Optional<Integer> age,
-                            @RequestParam Optional<Double> height,
-                            @RequestParam Optional<Double> weight,
-                            @RequestParam Optional<File> pic,
+                            @RequestParam Integer age,
+                            @RequestParam Double height,
+                            @RequestParam Double weight,
+                            @RequestParam File pic,
                             @RequestParam String practice
     ) {
-        Coach coach = repo.findById(id).orElse(null);
-        Client client;
-        try{
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            client = (Client) principal;
-        ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-        weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-        age.orElse(client.getAge()),goal,pic.orElse(null));
-            service.addRequest(prog);
-            System.out.println("Request saved" + prog);
-        }catch(Exception e ){
+//changer par : get Client by name or id
 
-        }
+            Client c = new Client(age,gender, pic.getPath(),weight,height,goal,practice);
+           // repository.saveReq(id,c);
 
     }
 

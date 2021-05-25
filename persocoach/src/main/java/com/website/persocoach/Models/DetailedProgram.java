@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public class DetailedProgram extends Program implements Serializable {
 
 
-    Coach coach;
-    Client client;
-    int complexity; //daily activity complexity
+
+   //daily activity complexity
+    String name;
     ArrayList<DailyProgram> dailyprogram ; // size : duration*7
 
 

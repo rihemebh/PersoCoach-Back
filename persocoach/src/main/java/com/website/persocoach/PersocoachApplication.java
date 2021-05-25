@@ -33,7 +33,7 @@ public class PersocoachApplication {
             int randomNum = (int) (Math.random() * (2));
             String[] genders = new String[2];
             genders[0] = "Women";
-            genders[1] = "Men";
+            genders[1] = "Man";
             String[] types = new String[2];
             types[0] = "Sport";
             types[1] = "Nutrition";

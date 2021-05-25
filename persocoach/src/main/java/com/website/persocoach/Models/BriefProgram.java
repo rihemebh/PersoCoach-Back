@@ -13,9 +13,5 @@ import java.io.Serializable;
 @Document(collection = "briefprogram")
 public class BriefProgram extends Program implements Serializable  {
 
-
-    Coach coach;
-    Client client;
-    String type;
     String description ;
 }
