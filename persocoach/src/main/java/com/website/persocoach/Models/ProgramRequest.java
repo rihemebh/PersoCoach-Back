@@ -39,4 +39,16 @@ public class ProgramRequest implements Serializable {
         this.goal = goal;
         this.url = url;
     }
+    public ProgramRequest(Coach coach, Client client,
+                          Double height, Double weight, String practice, String gender, Integer age,
+                          String goal ) {
+        this.coach = coach;
+        this.client = client;
+        this.height = height;
+        this.weight = weight;
+        this.practice = practice;
+        Gender = gender;
+        this.age = age;
+        this.goal = goal;
+    }
 }
