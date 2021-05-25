@@ -1,7 +1,13 @@
 package com.website.persocoach.controllers;
 
 
+import com.website.persocoach.Models.Admin;
+import com.website.persocoach.Models.Client;
+import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.User;
+import com.website.persocoach.repositories.AdminRepository;
+import com.website.persocoach.repositories.ClientRepository;
+import com.website.persocoach.repositories.CoachRepository;
 import com.website.persocoach.repositories.UserRepository;
 import com.website.persocoach.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,26 +27,34 @@ public class UserController {
 
     @Autowired UserDetailsServiceImpl userDetailsServiceImpl;
     @Autowired UserRepository userRepository;
+    @Autowired CoachRepository coachRepository;
+    @Autowired ClientRepository clientRepository;
+    @Autowired AdminRepository adminRepository;
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllUsers(){
-        List<User> users = userRepository.findAll();
-        if(users == null)
-            return new ResponseEntity<String>("no users found",HttpStatus.NOT_FOUND);
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-    }
+
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id){
-        User user;
         try{
-         user = userRepository.findUserById(id);
-        if(user == null){
-            return new ResponseEntity<String>("User requested does not exist!", HttpStatus.BAD_REQUEST);
-        }}catch(Exception e){
+         Optional<Coach> coach_user = coachRepository.findById(id);
+         if(coach_user.isEmpty()){
+            Optional<Client> client_user = clientRepository.findById(id);
+            if(client_user.isEmpty()){
+                Optional<Admin> admin_user = adminRepository.findById(id);
+                if(admin_user.isEmpty()){
+                    return new ResponseEntity<String>("User requested does not exist!", HttpStatus.BAD_REQUEST);
+                }else{
+                    return new ResponseEntity<Optional<Admin>>(admin_user, HttpStatus.OK);
+                }
+            }else{
+                return new ResponseEntity<Optional<Client>>(client_user, HttpStatus.OK);
+            }
+        }else{
+             return new ResponseEntity<Optional<Coach>>(coach_user, HttpStatus.OK);
+         }
+        }catch(Exception e){
             return new ResponseEntity<String>("Unexpected Error id", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
     @GetMapping("/username/{username}")

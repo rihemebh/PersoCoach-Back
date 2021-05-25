@@ -5,4 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface RequestRepositoriy extends MongoRepository<ProgramRequest , String>
   {
+    ProgramRequest getById(String id);
 }

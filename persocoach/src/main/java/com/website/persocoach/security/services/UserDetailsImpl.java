@@ -1,5 +1,6 @@
 package com.website.persocoach.security.services;
 
+import com.website.persocoach.Models.RoleType;
 import com.website.persocoach.Models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,8 +18,14 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+    private String child_id;
 
-    public UserDetailsImpl(String id, String username, String email, String password,  Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(
+            String id,
+            String username,
+            String email,
+            String password,
+            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -28,9 +35,11 @@ public class UserDetailsImpl implements UserDetails {
 
 
     public static UserDetailsImpl build(User user){
+
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
+
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
