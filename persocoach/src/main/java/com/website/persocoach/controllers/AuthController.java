@@ -71,7 +71,7 @@ public class AuthController {
                 roles));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/sign-up")
     @CrossOrigin(origins = "http://localhost:3000")
     private ResponseEntity<?> createUser(@RequestBody AuthenticationRequest authenticationRequest){
         String username = authenticationRequest.getUsername();
