@@ -84,18 +84,28 @@ public class ClientController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update")
-    public ResponseEntity<?> updateClientInfo(@RequestBody Client client
-                                              ){
+    public ResponseEntity<?> updateClientInfo(@RequestParam String id,
+                                              @RequestParam String name,
+                                              @RequestParam String description,
+                                              @RequestParam String pwd){
         try {
+            Client client1 = clientRepository.getClientById(id);
 
-
-            clientRepository.save(client);
-
-            if (client== null){
+            if (client1== null){
                 return new ResponseEntity<String>("error updating", HttpStatus.BAD_REQUEST);
             }
-            //Client updatedClient = clientRepository.save(existingClient);
-            return new ResponseEntity<Client>(client, HttpStatus.OK);
+            if(name != null){
+                client1.setName(name);
+            }
+            if(description != null){
+                client1.setDescription(description);
+            }
+            if(pwd != null){
+                client1.setPassword(passwordEncoder.encode(pwd));
+            }
+
+            Client updatedClient = clientRepository.save(client1);
+            return new ResponseEntity<Client>(updatedClient, HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<String>("err", HttpStatus.BAD_REQUEST);
         }

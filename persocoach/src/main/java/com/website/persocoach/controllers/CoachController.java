@@ -4,7 +4,9 @@ import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.Models.Review;
+import com.website.persocoach.repositories.ClientRepository;
 import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.RequestRepository;
 import com.website.persocoach.repositories.ReviewRepository;
 import com.website.persocoach.services.CoachService;
 import com.website.persocoach.services.RequestService;
@@ -35,7 +37,10 @@ public class CoachController {
     RequestService service;
     @Autowired
     ReviewRepository ReviewRepo;
-
+    @Autowired
+    ClientRepository clientRepository;
+    @Autowired
+    RequestRepository requestRepository;
     Collection<Coach> coaches = new ArrayList<>();
 
     CoachController(CoachService repository, RequestService service) {
@@ -72,32 +77,37 @@ public class CoachController {
         return repo.findById(id);
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.POST)
-    public ResponseEntity<?> saveRequest(@PathVariable  String id,
-                            @RequestParam Optional<String> gender,
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
+    public void saveRequest(@PathVariable  String id,
+                            @RequestParam String gender,
                             @RequestParam String goal,
-                            @RequestParam Optional<Integer> age,
-                            @RequestParam Optional<Double> height,
-                            @RequestParam Optional<Double> weight,
-                            @RequestParam Optional<File> pic,
+                            @RequestParam Integer age,
+                            @RequestParam Double height,
+                            @RequestParam Double weight,
+                            @RequestParam String c,
                             @RequestParam String practice
+
     ) {
+
+        Client client = clientRepository.findById(c).orElse(null);
+
+        //        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        try{
+//
+//            client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
+//
+//
+//        }catch(Exception e ){
+//
+//            client = new Client(principal.toString());
+//        }
+
+
         Coach coach = repo.findById(id).orElse(null);
-        Client client;
-        try{
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-            client = (Client) principal;
-            ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-            weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-            age.orElse(client.getAge()),goal,pic.orElse(null));
-            service.addRequest(prog);
-            System.out.println("Request saved" + prog);
-            return new ResponseEntity<Object>(client, HttpStatus.CREATED);
-        }catch(Exception e ){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+        ProgramRequest prog =new ProgramRequest(coach,client,height,
+                weight, practice, gender, age,goal,"pending");
+        requestRepository.save(prog);
     }
 
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
