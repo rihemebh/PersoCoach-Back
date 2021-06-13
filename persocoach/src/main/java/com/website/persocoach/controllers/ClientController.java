@@ -1,10 +1,8 @@
 package com.website.persocoach.controllers;
 
 import com.website.persocoach.Models.Client;
-import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.Role;
 import com.website.persocoach.Models.RoleType;
-import com.website.persocoach.payload.request.AuthenticationRequest;
 import com.website.persocoach.repositories.AdminRepository;
 import com.website.persocoach.repositories.ClientRepository;
 import com.website.persocoach.repositories.CoachRepository;
@@ -16,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -55,8 +52,8 @@ public class ClientController {
         client_user.setAge(client.getAge());
         client_user.setDescription((client.getDescription()));
         client_user.setGender(client.getGender());
-        client_user.setHeight(client.getHeight());
-        client_user.setWeight(client.getWeight());
+       // client_user.setHeight(client.getHeight());
+       // client_user.setWeight(client.getWeight());
         client_user.setName(client.getName());
         client_user.setUrl(client.getUrl());
 

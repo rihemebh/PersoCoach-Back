@@ -1,8 +1,7 @@
 package com.website.persocoach.controllers;
 
-import com.website.persocoach.Models.Client;
-import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.Review;
+import com.website.persocoach.Models.*;
+import com.website.persocoach.repositories.ClientRepository;
 import com.website.persocoach.repositories.CoachRepository;
 import com.website.persocoach.repositories.RequestRepositoriy;
 import com.website.persocoach.repositories.ReviewRepository;
@@ -14,9 +13,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -35,6 +34,8 @@ public class CoachController {
     RequestRepositoriy Reqrepo;
     @Autowired
     ReviewRepository ReviewRepo;
+    @Autowired
+    ClientRepository clientRepo;
 
 
     Collection<Coach> coaches = new ArrayList<>();
@@ -72,6 +73,11 @@ public class CoachController {
 
         return repo.findById(id);
     }
+    @RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
+    public List<ProgramRequest> getAllRequests(@PathVariable String id){
+      Coach c =repo.findById(id).orElse(null);
+    return   Reqrepo.getAllByCoach(c);
+    }
 
     @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
     public void saveRequest(@PathVariable  String id,
@@ -80,14 +86,30 @@ public class CoachController {
                             @RequestParam Integer age,
                             @RequestParam Double height,
                             @RequestParam Double weight,
-                            @RequestParam File pic,
+                            @RequestParam String c,
                             @RequestParam String practice
+
     ) {
-//changer par : get Client by name or id
 
-            Client c = new Client(age,gender, pic.getPath(),weight,height,goal,practice);
-           // repository.saveReq(id,c);
+        Client client = clientRepo.findById(c).orElse(null);
 
+        //        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        try{
+//
+//            client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
+//
+//
+//        }catch(Exception e ){
+//
+//            client = new Client(principal.toString());
+//        }
+
+
+        Coach coach = repo.findById(id).orElse(null);
+
+        ProgramRequest prog =new ProgramRequest(coach,client,height,
+                weight, practice, gender, age,goal,"pending");
+        Reqrepo.save(prog);
     }
 
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
@@ -105,6 +127,10 @@ public class CoachController {
         repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+
+
+
 
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Coach> updateCoach(@RequestBody Coach c) {
@@ -139,7 +165,12 @@ public class CoachController {
 
 
              }
-             coach.setRate( (int) ((r/reviews.size() +1) % 5));
+             if (r  % 5 == 0){
+                 coach.setRate(5);
+             }else{
+                 coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
+             }
+
              for(int i=0; i< reviews.size() ;i++){
                 reviews.get(i).getCoach().setRate(coach.getRate());
                  ReviewRepo.save(reviews.get(i));
@@ -154,13 +185,13 @@ public class CoachController {
      }
 
      repository.saveCoach(coach);
-     client = new Client(principal.toString());
+
      try {
-         client = (Client) principal;
+         client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
 
      }catch(Exception e){
          System.out.println(e);
-
+         client = new Client(principal.toString());
      }
      ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
  }

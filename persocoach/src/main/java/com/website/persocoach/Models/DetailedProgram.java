@@ -19,6 +19,6 @@ public class DetailedProgram extends Program implements Serializable {
    //daily activity complexity
     String name;
     ArrayList<DailyProgram> dailyprogram ; // size : duration*7
-
+    ProgramRequest request;
 
 }

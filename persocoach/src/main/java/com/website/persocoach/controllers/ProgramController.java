@@ -1,10 +1,10 @@
 package com.website.persocoach.controllers;
 
-import com.website.persocoach.Models.BriefProgram;
-import com.website.persocoach.Models.DailyProgram;
-import com.website.persocoach.Models.DetailedProgram;
+import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.BriefProgramRepository;
+import com.website.persocoach.repositories.CoachRepository;
 import com.website.persocoach.repositories.ProgramRepository;
+import com.website.persocoach.repositories.RequestRepositoriy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -26,6 +27,10 @@ public class ProgramController {
     BriefProgramRepository repo;
     @Autowired
     ProgramRepository repo1;
+    @Autowired
+    RequestRepositoriy reqrepo;
+    @Autowired
+    CoachRepository crepo;
 
 /****************************Brief Program***************************/
 
@@ -35,22 +40,34 @@ public class ProgramController {
          return  repo.findAll(page);
     }
 
-    @RequestMapping(value = "/bprogram/add", method = RequestMethod.PUT)
-    public ResponseEntity<BriefProgram> add(@RequestBody BriefProgram bp) throws URISyntaxException {
+    @RequestMapping(value = "/bprogram/add/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<BriefProgram> add(@RequestBody BriefProgram bp,@PathVariable String id) throws URISyntaxException {
+        ProgramRequest pr = reqrepo.getById(id);
+        pr.setStatus("accepted");
+        reqrepo.save(pr);
+        bp.setRequest(pr);
         repo.save(bp);
         return  ResponseEntity.created(new URI("/api/bprogram/add/" + bp.getId())).body(bp);
     }
 
     @RequestMapping(value = "/bprogram/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteCoach(@PathVariable String  id) {
+    public ResponseEntity<?> deletebprogram(@PathVariable String  id) {
         repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/bprogram/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BriefProgram> updateCoach(@RequestBody BriefProgram bp) {
+    public ResponseEntity<BriefProgram> updateprogram(@RequestBody BriefProgram bp) {
         repo.save(bp);
         return ResponseEntity.ok().body(bp);
+    }
+
+    @RequestMapping(value = "/bprogram/{id}/response", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BriefProgram> bprogramesp(@PathVariable String id,@RequestBody String rep) {
+        BriefProgram prog  = repo.findById(id).orElse(null);
+        prog.getRequest().setStatus(rep);
+        repo.save(prog);
+        return ResponseEntity.ok().body(prog);
     }
 
     @RequestMapping(value ="/bprogram/{id}", method = RequestMethod.GET)
@@ -59,14 +76,17 @@ public class ProgramController {
         return repo.findById(id);
     }
 
-
+    @RequestMapping(value ="/bprogram/request", method = RequestMethod.POST)
+    public Optional<BriefProgram> getBriefProgramByRequest(@RequestBody ProgramRequest request) {
+        return repo.findByRequest(request);
+    }
 
     /****************************detailed Program***************************/
 
-    @RequestMapping(value = "/program", method = RequestMethod.GET)
-    public Page<DetailedProgram> getallPrograms(Pageable page){
-
-        return  repo1.findAll(page);
+    @RequestMapping(value = "/programs/{id}", method = RequestMethod.GET)
+    public List<DetailedProgram> getAll(@PathVariable String id){
+        Coach c = crepo.findById(id).orElse(null);
+        return  repo1.findAllByCoach(c).orElse(null);
     }
 
     @RequestMapping(value = "/program/add", method = RequestMethod.PUT)
