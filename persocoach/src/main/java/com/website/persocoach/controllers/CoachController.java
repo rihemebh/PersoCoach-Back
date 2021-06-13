@@ -1,8 +1,14 @@
 package com.website.persocoach.controllers;
 
+import com.website.persocoach.Models.Client;
+import com.website.persocoach.Models.Coach;
+import com.website.persocoach.Models.ProgramRequest;
+import com.website.persocoach.Models.Review;
+import com.website.persocoach.repositories.ClientRepository;
 import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.ClientRepository;
 import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.RequestRepository;
 import com.website.persocoach.repositories.RequestRepositoriy;
 import com.website.persocoach.repositories.ReviewRepository;
 import com.website.persocoach.security.jwt.CoachService;
@@ -10,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -34,6 +42,10 @@ public class CoachController {
     RequestRepositoriy Reqrepo;
     @Autowired
     ReviewRepository ReviewRepo;
+    @Autowired
+    ClientRepository clientRepository;
+    @Autowired
+    RequestRepository requestRepository;
     @Autowired
     ClientRepository clientRepo;
 
@@ -92,19 +104,6 @@ public class CoachController {
     ) {
 
         Client client = clientRepo.findById(c).orElse(null);
-
-        //        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        try{
-//
-//            client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
-//
-//
-//        }catch(Exception e ){
-//
-//            client = new Client(principal.toString());
-//        }
-
-
         Coach coach = repo.findById(id).orElse(null);
 
         ProgramRequest prog =new ProgramRequest(coach,client,height,
@@ -143,8 +142,6 @@ public class CoachController {
 
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
-
-
     }
 
 
