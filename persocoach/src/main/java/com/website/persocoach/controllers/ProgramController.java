@@ -91,6 +91,10 @@ public class ProgramController {
 
     @RequestMapping(value = "/program/add", method = RequestMethod.PUT)
     public String addProgram(@RequestBody DetailedProgram p) throws URISyntaxException {
+        ProgramRequest pr = reqrepo.getById(p.getRequest().getId());
+        pr.setStatus("closed");
+        reqrepo.save(pr);
+        p.setRequest(pr);
         repo1.save(p);
         return  p.getId();
     }
@@ -119,8 +123,6 @@ public class ProgramController {
        DetailedProgram dp=  repo1.findById(id).orElse(null);
         ArrayList<DailyProgram> daily;
         assert dp != null;
-
-
         if(dp.getDailyprogram() == null)
            daily  = new ArrayList<>();
          else daily = dp.getDailyprogram();

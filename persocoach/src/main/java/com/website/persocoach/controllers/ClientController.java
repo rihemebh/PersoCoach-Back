@@ -100,6 +100,7 @@ public class ClientController {
             }
             if(name != null){
                 client1.setName(name);
+
             }
             if(description != null){
                 client1.setDescription(description);

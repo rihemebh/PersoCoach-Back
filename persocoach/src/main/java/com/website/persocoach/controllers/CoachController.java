@@ -4,26 +4,19 @@ import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.Models.Review;
-import com.website.persocoach.repositories.ClientRepository;
-import com.website.persocoach.Models.*;
-import com.website.persocoach.repositories.ClientRepository;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.RequestRepository;
-import com.website.persocoach.repositories.RequestRepositoriy;
-import com.website.persocoach.repositories.ReviewRepository;
+import com.website.persocoach.repositories.*;
 import com.website.persocoach.security.jwt.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -34,6 +27,9 @@ import java.util.*;
 
 public class CoachController {
 
+
+    @Autowired
+    PasswordEncoder encoder;
     CoachService repository;
     @Autowired
     CoachRepository repo;
@@ -133,6 +129,7 @@ public class CoachController {
 
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Coach> updateCoach(@RequestBody Coach c) {
+        c.setPassword(encoder.encode(c.getPassword()));
         repository.saveCoach(c);
         return ResponseEntity.ok().body(c);
     }
