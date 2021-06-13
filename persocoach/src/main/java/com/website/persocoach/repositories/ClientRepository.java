@@ -13,6 +13,6 @@ public interface ClientRepository extends MongoRepository<Client, String> {
     Boolean existsByEmail(String email);
     Boolean existsByUsername(String username);
     String getIdByUsername(String username);
-
+    Client getClientById(String id);
     Optional<Client> findById(String id);
 }

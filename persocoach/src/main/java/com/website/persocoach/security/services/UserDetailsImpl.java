@@ -18,7 +18,6 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-    private String child_id;
 
     public UserDetailsImpl(
             String id,

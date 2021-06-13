@@ -21,6 +21,14 @@ public class Client extends User implements Serializable {
     public Client(String email, String username, String password,Set<Role> roles){
         super(email,username,password,roles);
     }
+//
+//    public Client(String id, String email, String username, String password,Set<Role> roles){
+//        super(id, email,username,password,roles);
+//    }
+//
+//    public Client(String id, String email, String username, String password,Set<Role> roles){
+//        super(id, email,username,password,roles);
+//    }
 
     public Client(String email, String username, String password, Set<Role> roles, String name, String url, String description) {
         super(email, username, password, roles);
@@ -29,6 +37,7 @@ public class Client extends User implements Serializable {
         this.description = description;
     }
 
+
     private String name;
     private Integer age;
     private String gender;
@@ -36,7 +45,7 @@ public class Client extends User implements Serializable {
     private Double weight;
     private Double height;
     private String description;
-    private List<ProgramRequest> programRequestList;
+    //private List<ProgramRequest> programRequestList;
     public Client(String name){
         this.name= name;
     }

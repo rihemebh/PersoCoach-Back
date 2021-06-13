@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,8 +72,8 @@ public class CoachController {
         return repo.findById(id);
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable  String id,
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.POST)
+    public ResponseEntity<?> saveRequest(@PathVariable  String id,
                             @RequestParam Optional<String> gender,
                             @RequestParam String goal,
                             @RequestParam Optional<Integer> age,
@@ -85,14 +86,16 @@ public class CoachController {
         Client client;
         try{
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
             client = (Client) principal;
-        ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-        weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-        age.orElse(client.getAge()),goal,pic.orElse(null));
+            ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
+            weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
+            age.orElse(client.getAge()),goal,pic.orElse(null));
             service.addRequest(prog);
             System.out.println("Request saved" + prog);
+            return new ResponseEntity<Object>(client, HttpStatus.CREATED);
         }catch(Exception e ){
-
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }

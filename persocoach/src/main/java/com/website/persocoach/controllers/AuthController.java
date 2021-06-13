@@ -100,8 +100,6 @@ public class AuthController {
             return new ResponseEntity<String>("Email "+email+" already exists", HttpStatus.BAD_REQUEST);
         }
 
-
-
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(RoleType.ROLE_CLIENT)
                 .orElseThrow(() -> new RuntimeException("Error : Role is not found."));
