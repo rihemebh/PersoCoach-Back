@@ -28,9 +28,9 @@ public class Coach extends User implements Serializable {
     @Field(value = "desription")
     private String description;
     @Field(value = "acadamicExp")
-    private ArrayList<String> acadamicExp = new ArrayList<>();
+    private ArrayList<experience> acadamicExp = new ArrayList<>();
     @Field(value = "workExp")
-    private ArrayList<String> workExp = new ArrayList<>();
+    private ArrayList<experience> workExp = new ArrayList<>();
     @Field(value = "rate")
     private int rate;
 

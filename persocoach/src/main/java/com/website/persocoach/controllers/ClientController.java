@@ -5,6 +5,10 @@ import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.Models.Role;
 import com.website.persocoach.Models.RoleType;
 import com.website.persocoach.repositories.*;
+import com.website.persocoach.repositories.AdminRepository;
+import com.website.persocoach.repositories.ClientRepository;
+import com.website.persocoach.repositories.CoachRepository;
+import com.website.persocoach.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +57,8 @@ public class ClientController {
         client_user.setAge(client.getAge());
         client_user.setDescription((client.getDescription()));
         client_user.setGender(client.getGender());
-        client_user.setHeight(client.getHeight());
-        client_user.setWeight(client.getWeight());
+       // client_user.setHeight(client.getHeight());
+       // client_user.setWeight(client.getWeight());
         client_user.setName(client.getName());
         client_user.setUrl(client.getUrl());
 

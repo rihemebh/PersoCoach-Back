@@ -18,9 +18,7 @@ import java.util.Set;
 public class Client extends User implements Serializable {
 
 
-    public Client(String email, String username, String password,Set<Role> roles){
-        super(email,username,password,roles);
-    }
+
 //
 //    public Client(String id, String email, String username, String password,Set<Role> roles){
 //        super(id, email,username,password,roles);
@@ -42,12 +40,18 @@ public class Client extends User implements Serializable {
     private Integer age;
     private String gender;
     private String url;
-    private Double weight;
-    private Double height;
     private String description;
+
+
+    public Client(String email, String username, String password,Set<Role> roles){
+        super(email,username,password,roles);
+    }
+
+
     //private List<ProgramRequest> programRequestList;
     public Client(String name){
         this.name= name;
     }
+
 
 }

@@ -73,7 +73,7 @@ public class AuthController {
                     userDetails.getEmail(),
                     roles));
         }catch(Exception e){
-            return new ResponseEntity<String>("Error!" +
+            return new ResponseEntity<String>("Error!" +e+
                     "", HttpStatus.BAD_REQUEST);
         }
 
