@@ -1,5 +1,6 @@
 package com.website.persocoach.repositories;
 
+import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
 import com.website.persocoach.Models.ProgramRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -12,5 +13,8 @@ public interface RequestRepositoriy extends MongoRepository<ProgramRequest , Str
     ProgramRequest getById(String id);
     @Query("{'Coach' : ?0}")
     List<ProgramRequest> getAllByCoach(Coach c);
+    List<ProgramRequest> getProgramRequestsByClient(Client client);
+    List<ProgramRequest> getProgramRequestsByClient_Id(String id);
+
 
 }

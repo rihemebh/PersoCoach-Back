@@ -4,12 +4,11 @@ package com.website.persocoach.controllers;
 import com.website.persocoach.Models.Admin;
 import com.website.persocoach.Models.Client;
 import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.User;
-import com.website.persocoach.repositories.AdminRepository;
-import com.website.persocoach.repositories.ClientRepository;
-import com.website.persocoach.repositories.CoachRepository;
 import com.website.persocoach.repositories.UserRepository;
 import com.website.persocoach.security.services.UserDetailsServiceImpl;
+import com.website.persocoach.services.AdminService;
+import com.website.persocoach.services.ClientService;
+import com.website.persocoach.services.CoachesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -27,20 +25,21 @@ public class UserController {
 
     @Autowired UserDetailsServiceImpl userDetailsServiceImpl;
     @Autowired UserRepository userRepository;
-    @Autowired CoachRepository coachRepository;
-    @Autowired ClientRepository clientRepository;
-    @Autowired AdminRepository adminRepository;
+    @Autowired
+    CoachesService coachesService;
+    @Autowired ClientService clientService;
+    @Autowired AdminService adminService;
 
 
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id){
         try{
-         Optional<Coach> coach_user = coachRepository.findById(id);
+         Optional<Coach> coach_user = coachesService.findById(id);
          if(coach_user.isEmpty()){
-            Optional<Client> client_user = clientRepository.findById(id);
+            Optional<Client> client_user = clientService.findById(id);
             if(client_user.isEmpty()){
-                Optional<Admin> admin_user = adminRepository.findById(id);
+                Optional<Admin> admin_user = adminService.getById(id);
                 if(admin_user.isEmpty()){
                     return new ResponseEntity<String>("User requested does not exist!", HttpStatus.BAD_REQUEST);
                 }else{

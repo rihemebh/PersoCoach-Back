@@ -12,6 +12,8 @@ import com.website.persocoach.repositories.RequestRepository;
 import com.website.persocoach.repositories.RequestRepositoriy;
 import com.website.persocoach.repositories.ReviewRepository;
 import com.website.persocoach.security.jwt.CoachService;
+import com.website.persocoach.services.ClientService;
+import com.website.persocoach.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -87,8 +89,8 @@ public class CoachController {
     }
     @RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
     public List<ProgramRequest> getAllRequests(@PathVariable String id){
-      Coach c =repo.findById(id).orElse(null);
-    return   Reqrepo.getAllByCoach(c);
+        Coach c =repo.findById(id).orElse(null);
+        return   Reqrepo.getAllByCoach(c);
     }
 
     @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
@@ -145,53 +147,53 @@ public class CoachController {
     }
 
 
- /******* Reviews ********/
+    /******* Reviews ********/
 
 
- @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
- public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
-     Client client;
-     Coach coach= repo.findById(id).orElse(null);
-     List<Review> reviews = ReviewRepo.findAllByCoach(coach);
-     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-     double r=rate;
-     try{
-         if (reviews.size() > 0) {
-             for(int i=0; i< reviews.size() ;i++){
-                 r+= reviews.get(i).getRate();
+    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
+    public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
+        Client client;
+        Coach coach= repo.findById(id).orElse(null);
+        List<Review> reviews = ReviewRepo.findAllByCoach(coach);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        double r=rate;
+        try{
+            if (reviews.size() > 0) {
+                for(int i=0; i< reviews.size() ;i++){
+                    r+= reviews.get(i).getRate();
 
 
-             }
-             if (r  % 5 == 0){
-                 coach.setRate(5);
-             }else{
-                 coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
-             }
+                }
+                if (r  % 5 == 0){
+                    coach.setRate(5);
+                }else{
+                    coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
+                }
 
-             for(int i=0; i< reviews.size() ;i++){
-                reviews.get(i).getCoach().setRate(coach.getRate());
-                 ReviewRepo.save(reviews.get(i));
+                for(int i=0; i< reviews.size() ;i++){
+                    reviews.get(i).getCoach().setRate(coach.getRate());
+                    ReviewRepo.save(reviews.get(i));
 
-             }
-         }else{
-             coach.setRate(rate);
-         }
-     }catch(Exception e){
-         System.out.println(coach);
-         System.out.println(e);
-     }
+                }
+            }else{
+                coach.setRate(rate);
+            }
+        }catch(Exception e){
+            System.out.println(coach);
+            System.out.println(e);
+        }
 
-     repository.saveCoach(coach);
+        repository.saveCoach(coach);
 
-     try {
-         client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
+        try {
+            client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
 
-     }catch(Exception e){
-         System.out.println(e);
-         client = new Client(principal.toString());
-     }
-     ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
- }
+        }catch(Exception e){
+            System.out.println(e);
+            client = new Client(principal.toString());
+        }
+        ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
+    }
     @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
     public List<Review> getCoachesReview(@PathVariable String id){
         Optional<Coach> coach = repo.findById(id);

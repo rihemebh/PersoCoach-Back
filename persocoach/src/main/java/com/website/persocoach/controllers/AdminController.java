@@ -2,10 +2,10 @@ package com.website.persocoach.controllers;
 
 import com.website.persocoach.Models.*;
 import com.website.persocoach.payload.request.AuthenticationRequest;
-import com.website.persocoach.repositories.AdminRepository;
-import com.website.persocoach.repositories.ClientRepository;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.RoleRepository;
+import com.website.persocoach.services.AdminService;
+import com.website.persocoach.services.ClientService;
+import com.website.persocoach.services.CoachesService;
+import com.website.persocoach.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ import java.util.Set;
 @CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
 
-    @Autowired private AdminRepository adminRepository;
-    @Autowired private CoachRepository coachRepository;
-    @Autowired private ClientRepository clientRepository;
-    @Autowired private RoleRepository roleRepository;
+    @Autowired private AdminService adminService;
+    @Autowired private CoachesService coachesService;
+    @Autowired private ClientService clientService;
+    @Autowired private RoleService roleService;
     @Autowired private PasswordEncoder passwordEncoder;
 
 
@@ -33,16 +33,16 @@ public class AdminController {
         String password = authenticationRequest.getPassword();
         String email = authenticationRequest.getEmail();
 
-        if(adminRepository.existsByUsername(authenticationRequest.getUsername())
-                || clientRepository.existsByUsername(authenticationRequest.getUsername())
-                || coachRepository.existsByUsername(authenticationRequest.getUsername())
+        if(adminService.existsByUsername(authenticationRequest.getUsername())
+                || clientService.existsByUsername(authenticationRequest.getUsername())
+                || coachesService.existsByUsername(authenticationRequest.getUsername())
         ){
             return new ResponseEntity<String>("Username "+username+" already exists", HttpStatus.BAD_REQUEST);
         }
 
-        if(adminRepository.existsByEmail(authenticationRequest.getEmail())
-                || clientRepository.existsByUsername(authenticationRequest.getEmail())
-                || coachRepository.existsByUsername(authenticationRequest.getEmail())
+        if(adminService.existsByEmail(authenticationRequest.getEmail())
+                || clientService.existsByUsername(authenticationRequest.getEmail())
+                || coachesService.existsByUsername(authenticationRequest.getEmail())
         ){
             return new ResponseEntity<String>("Email "+email+" already exists", HttpStatus.BAD_REQUEST);
         }
@@ -50,12 +50,12 @@ public class AdminController {
 
 
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName(RoleType.ROLE_COACH)
+        Role userRole = roleService.findByName(RoleType.ROLE_COACH)
                 .orElseThrow(() -> new RuntimeException("Error : Role is not found."));
         roles.add(userRole);
         Coach coach_user = new Coach(email,username,passwordEncoder.encode(password),roles);
         try{
-            coachRepository.save(coach_user);
+            coachesService.save(coach_user);
         }catch(Exception e){
             return new ResponseEntity<String>("error while creating coach", HttpStatus.BAD_GATEWAY);
         }
@@ -68,28 +68,28 @@ public class AdminController {
         String password = authenticationRequest.getPassword();
         String email = authenticationRequest.getEmail();
 
-        if(adminRepository.existsByUsername(authenticationRequest.getUsername())
-                || clientRepository.existsByUsername(authenticationRequest.getUsername())
-                || coachRepository.existsByUsername(authenticationRequest.getUsername())
+        if(adminService.existsByUsername(authenticationRequest.getUsername())
+                || clientService.existsByUsername(authenticationRequest.getUsername())
+                || coachesService.existsByUsername(authenticationRequest.getUsername())
         ){
             return new ResponseEntity<String>("Username "+username+" already exists", HttpStatus.BAD_REQUEST);
         }
 
-        if(adminRepository.existsByEmail(authenticationRequest.getEmail())
-                || clientRepository.existsByUsername(authenticationRequest.getEmail())
-                || coachRepository.existsByUsername(authenticationRequest.getEmail())
+        if(adminService.existsByEmail(authenticationRequest.getEmail())
+                || clientService.existsByUsername(authenticationRequest.getEmail())
+                || coachesService.existsByUsername(authenticationRequest.getEmail())
         ){
             return new ResponseEntity<String>("Email "+email+" already exists", HttpStatus.BAD_REQUEST);
         }
 
 
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName(RoleType.ROLE_ADMIN)
+        Role userRole = roleService.findByName(RoleType.ROLE_ADMIN)
                 .orElseThrow(() -> new RuntimeException("Error : Role is not found."));
         roles.add(userRole);
         Admin admin = new Admin(email,username,passwordEncoder.encode(password),roles);
         try{
-            adminRepository.save(admin);
+            adminService.save(admin);
         }catch(Exception e){
             return new ResponseEntity<String>("error while creating coach", HttpStatus.BAD_GATEWAY);
         }
