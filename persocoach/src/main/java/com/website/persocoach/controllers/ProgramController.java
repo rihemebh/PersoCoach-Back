@@ -90,9 +90,9 @@ public class ProgramController {
     }
 
     @RequestMapping(value = "/program/add", method = RequestMethod.PUT)
-    public ResponseEntity<DetailedProgram> addProgram(@RequestBody DetailedProgram p) throws URISyntaxException {
+    public String addProgram(@RequestBody DetailedProgram p) throws URISyntaxException {
         repo1.save(p);
-        return  ResponseEntity.created(new URI("/api/program/add/" + p.getId())).body(p);
+        return  p.getId();
     }
 
     @RequestMapping(value = "/program/delete/{id}", method = RequestMethod.DELETE)
@@ -117,12 +117,16 @@ public class ProgramController {
     public ResponseEntity<DetailedProgram> addDayProgram(@PathVariable String id,
     @RequestBody DailyProgram d) {
        DetailedProgram dp=  repo1.findById(id).orElse(null);
-        ArrayList<DailyProgram> daily = dp.getDailyprogram();
+        ArrayList<DailyProgram> daily;
+        assert dp != null;
+
+
+        if(dp.getDailyprogram() == null)
+           daily  = new ArrayList<>();
+         else daily = dp.getDailyprogram();
         daily.add(d);
         dp.setDailyprogram(daily);
         repo1.save(dp);
         return ResponseEntity.ok().body(dp);
     }
-
-
 }

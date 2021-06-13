@@ -2,7 +2,6 @@ package com.website.persocoach.Models;
 
 import lombok.Data;
 
-import java.io.File;
 import java.io.Serializable;
 
 @Data
@@ -16,7 +15,7 @@ public class DailyProgram implements Serializable {
     String extra;
     int WaterQuantity;
     String restrictions;
-    File videos;
+    String videos;
     String activitydesritpion;
 
 }
