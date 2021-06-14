@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ProgramRepository extends MongoRepository<DetailedProgram, String> {
     @Query("{ 'coach' : ?0 }")
     Optional<List<DetailedProgram>> findAllByCoach(Coach c);
+
+    Optional<List<DetailedProgram>> findAllByCoach_Id(String c);
 }

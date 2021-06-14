@@ -1,7 +1,7 @@
 package com.website.persocoach.security.jwt;
 
 import com.website.persocoach.Models.ProgramRequest;
-import com.website.persocoach.repositories.RequestRepository;
+import com.website.persocoach.repositories.RequestRepositoriy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class RequestService {
 
     @Autowired
-    RequestRepository repo;
+    RequestRepositoriy repo;
 
 
     public void addRequest(ProgramRequest request){

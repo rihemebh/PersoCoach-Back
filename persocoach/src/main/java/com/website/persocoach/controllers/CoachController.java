@@ -1,9 +1,6 @@
 package com.website.persocoach.controllers;
 
-import com.website.persocoach.Models.Client;
-import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.ProgramRequest;
-import com.website.persocoach.Models.Review;
+import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.*;
 import com.website.persocoach.security.jwt.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +30,20 @@ public class CoachController {
     CoachService repository;
     @Autowired
     CoachRepository repo;
-
+    @Autowired
+    BriefProgramRepository brepo;
     @Autowired
     RequestRepositoriy Reqrepo;
     @Autowired
     ReviewRepository ReviewRepo;
     @Autowired
     ClientRepository clientRepository;
-    @Autowired
-    RequestRepository requestRepository;
+    //@Autowired
+   // RequestRepository requestRepository;
     @Autowired
     ClientRepository clientRepo;
+    @Autowired
+    ProgramRepository repo1;
 
 
     Collection<Coach> coaches = new ArrayList<>();
@@ -130,6 +130,29 @@ public class CoachController {
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Coach> updateCoach(@RequestBody Coach c) {
         c.setPassword(encoder.encode(c.getPassword()));
+       List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
+        BriefProgram bprogram;
+        for (ProgramRequest prog: progs
+             ) {
+            bprogram = brepo.findByRequest(prog).orElse(null);
+            if(bprogram != null){
+                bprogram.setRequest(prog);
+                brepo.save(bprogram);
+            }
+
+            prog.setCoach(c);
+
+            Reqrepo.save(prog);
+        }
+       List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
+        if (programs != null)
+        {
+            for (DetailedProgram prog: programs
+            ) {
+                prog.setCoach(c);
+                repo1.save(prog);
+            }
+        }
         repository.saveCoach(c);
         return ResponseEntity.ok().body(c);
     }

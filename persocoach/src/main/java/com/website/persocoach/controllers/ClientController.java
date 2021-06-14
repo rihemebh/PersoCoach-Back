@@ -29,7 +29,7 @@ public class ClientController {
     @Autowired private AdminRepository adminRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private RequestRepository requestRepository;
+    @Autowired private RequestRepositoriy requestRepository;
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")

@@ -1,19 +1,7 @@
 package com.website.persocoach;
 
-import com.website.persocoach.Models.*;
-import com.website.persocoach.repositories.ClientRepository;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.RequestRepository;
-import com.website.persocoach.repositories.RoleRepository;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 @SpringBootApplication
 

@@ -43,7 +43,7 @@ public class ProgramController {
     @RequestMapping(value = "/bprogram/add/{id}", method = RequestMethod.PUT)
     public ResponseEntity<BriefProgram> add(@RequestBody BriefProgram bp,@PathVariable String id) throws URISyntaxException {
         ProgramRequest pr = reqrepo.getById(id);
-        pr.setStatus("accepted");
+        pr.setStatus("Waiting for response");
         reqrepo.save(pr);
         bp.setRequest(pr);
         repo.save(bp);
