@@ -25,10 +25,11 @@ public class ProgramRequest implements Serializable {
     Integer age;
     String goal;
     File url;
+    String status;
 
     public ProgramRequest(Coach coach, Client client,
                           Double height, Double weight, String practice, String gender, Integer age,
-                          String goal, File url) {
+                          String goal, File url,String status) {
         this.coach = coach;
         this.client = client;
         this.height = height;
@@ -38,5 +39,19 @@ public class ProgramRequest implements Serializable {
         this.age = age;
         this.goal = goal;
         this.url = url;
+        this.status = status;
+    }
+    public ProgramRequest(Coach coach, Client client,
+                          Double height, Double weight, String practice, String gender, Integer age,
+                          String goal ,String status) {
+        this.coach = coach;
+        this.client = client;
+        this.height = height;
+        this.weight = weight;
+        this.practice = practice;
+        Gender = gender;
+        this.age = age;
+        this.goal = goal;
+        this.status = status;
     }
 }

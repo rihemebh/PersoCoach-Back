@@ -1,19 +1,7 @@
 package com.website.persocoach;
 
-import com.github.javafaker.Faker;
-import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.Role;
-import com.website.persocoach.Models.RoleType;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.RoleRepository;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 @SpringBootApplication
 
@@ -24,12 +12,18 @@ public class PersocoachApplication {
         SpringApplication.run(PersocoachApplication.class, args);
     }
 
-
+/*
    @Bean
-    public CommandLineRunner init(CoachRepository repo,RoleRepository r) {
+    public CommandLineRunner init(
+            CoachRepository repo,
+            RoleRepository r,
+            ClientRepository crep,
+            RequestRepository reqrep,
+            PasswordEncoder encoder
+            ) {
 
         return args -> {
-          //  Random rand = new Random();
+            Random rand = new Random();
             int randomNum = (int) (Math.random() * (2));
             String[] genders = new String[2];
             genders[0] = "Women";
@@ -51,7 +45,7 @@ public class PersocoachApplication {
                 c.setRoles(role);
                 c.setName(faker.name().fullName());
                 c.setType(types[randomNum]);
-                //c.setId(new ObjectId(faker.idNumber().toString()));
+                c.setId(new ObjectId(faker.idNumber().toString()));
                 c.setGender(genders[randomNum]);
                 c.setUrl(faker.internet().image());
                 c.setDescription(faker.lorem().paragraph());
@@ -67,8 +61,38 @@ public class PersocoachApplication {
 
                 repo.save(c);
 
+            Set<Role> role = new HashSet<>();
+            role.add(r.findByName(RoleType.ROLE_COACH).orElse(new Role(RoleType.ROLE_COACH)));
 
+            Coach coach = new Coach(
+                    "coach@coach.com",
+                    "supercoach",
+                    "coach123",
+                    role
+                    );
+            coach.setName("Mohamed Foulen");
+            coach.setType("Sport");
+            coach.setGender("Male");
+            coach.setDescription("I can change your lifestyle");
+            coach.setUrl("https://www.superprof.fr/images/annonces/professeur-home-coach-sportif-personnel-bruxelles-woluwe-fitnastic-alentours.jpg");
 
+            //repo.save(coach);
+
+            //Set<Role> role2 = new HashSet<>();
+            //role2.add(r.findByName(RoleType.ROLE_CLIENT).orElse(new Role(RoleType.ROLE_CLIENT)));
+            Client client = crep.findByUsername("test");
+
+            ProgramRequest programRequest = reqrep.getById("60a6c41b45d438377181111c");
+
+            ArrayList<ProgramRequest> list = new ArrayList<ProgramRequest>();
+            list.add(programRequest);
+
+            client.setPassword(encoder.encode("test123"));
+
+            //reqrep.save(programRequest);
+            crep.save(client);
         };
     }
+    */
+
 }

@@ -4,8 +4,7 @@ package com.website.persocoach.controllers;
 import com.website.persocoach.Models.*;
 import com.website.persocoach.payload.request.AuthenticationRequest;
 import com.website.persocoach.payload.response.JwtResponse;
-import com.website.persocoach.repositories.RoleRepository;
-import com.website.persocoach.repositories.UserRepository;
+import com.website.persocoach.repositories.*;
 import com.website.persocoach.security.jwt.JwtUtils;
 import com.website.persocoach.security.services.UserDetailsImpl;
 import com.website.persocoach.security.services.UserDetailsServiceImpl;
@@ -28,12 +27,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired private UserRepository userRepository;
+    @Autowired private CoachRepository coachRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private AdminRepository adminRepository;
+    @Autowired private ClientRepository clientRepository;
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private UserDetailsServiceImpl userDetailsServiceImpl;
     @Autowired private JwtUtils jwtUtils;
     @Autowired private PasswordEncoder passwordEncoder;
+
 
 
     @PostMapping("/sign-in")
@@ -54,21 +56,27 @@ public class AuthController {
         }catch (Exception e){
             return new ResponseEntity<String>("error authenticating", HttpStatus.BAD_REQUEST);
         }
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsServiceImpl.loadUserByUsername(authenticationRequest.getUsername());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        try{
+            UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsServiceImpl.loadUserByUsername(authenticationRequest.getUsername());
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
-        //UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
-        String jwt = jwtUtils.generateToken(userDetails);
+            //UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+            String jwt = jwtUtils.generateToken(userDetails);
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles));
+        }catch(Exception e){
+            return new ResponseEntity<String>("Error!" +e+
+                    "", HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @PostMapping("/sign-up")
@@ -78,26 +86,30 @@ public class AuthController {
         String password = authenticationRequest.getPassword();
         String email = authenticationRequest.getEmail();
         //User existingUser = userRepository.findByUsername(username);
-        if(userRepository.existsByUsername(authenticationRequest.getUsername())){
-            return new ResponseEntity<String>("user with username "+username+" already exists", HttpStatus.BAD_REQUEST);
+        if(adminRepository.existsByUsername(authenticationRequest.getUsername())
+                || clientRepository.existsByUsername(authenticationRequest.getUsername())
+                || coachRepository.existsByUsername(authenticationRequest.getUsername())
+        ){
+            return new ResponseEntity<String>("Username "+username+" already exists", HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(authenticationRequest.getEmail())){
-            return new ResponseEntity<String>("user with Email "+email+" already exists", HttpStatus.BAD_REQUEST);
+        if(adminRepository.existsByEmail(authenticationRequest.getEmail())
+                || clientRepository.existsByUsername(authenticationRequest.getEmail())
+                || coachRepository.existsByUsername(authenticationRequest.getEmail())
+        ){
+            return new ResponseEntity<String>("Email "+email+" already exists", HttpStatus.BAD_REQUEST);
         }
 
-        User user = new User(email,username,passwordEncoder.encode(password));
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(RoleType.ROLE_CLIENT)
                 .orElseThrow(() -> new RuntimeException("Error : Role is not found."));
         roles.add(userRole);
-        user.setRoles(roles);
+        Client client_user = new Client(email,username,passwordEncoder.encode(password),roles);
         try{
-            userRepository.save(user);
+            clientRepository.save(client_user);
         }catch(Exception e){
-            return new ResponseEntity<String>("error while creating user", HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<String>("error while creating client", HttpStatus.BAD_GATEWAY);
         }
-        return new ResponseEntity<String>("user has been successfully signed up", HttpStatus.CREATED);
-
+        return new ResponseEntity<String>("client has been successfully signed up", HttpStatus.CREATED);
     }
 }

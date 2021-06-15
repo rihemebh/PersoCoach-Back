@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 @Data
@@ -27,11 +28,15 @@ public class Coach extends User implements Serializable {
     @Field(value = "desription")
     private String description;
     @Field(value = "acadamicExp")
-    private ArrayList<String> acadamicExp = new ArrayList<>();
+    private ArrayList<experience> acadamicExp = new ArrayList<>();
     @Field(value = "workExp")
-    private ArrayList<String> workExp = new ArrayList<>();
+    private ArrayList<experience> workExp = new ArrayList<>();
     @Field(value = "rate")
     private int rate;
+
+    public Coach(String email, String username, String password, Set<Role> roles){
+        super(email,username,password,roles);
+    }
 
 
 }

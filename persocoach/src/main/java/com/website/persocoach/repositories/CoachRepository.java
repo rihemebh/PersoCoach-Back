@@ -18,6 +18,13 @@ public interface CoachRepository extends MongoRepository<Coach,String> {
 
     @Query("{ '_id' : ?0 }")
     Optional<Coach> findById(String id);
+    Coach findByUsername(String name);
+    @Query(
+            "{ 'acadamicExp' : { $elemMatch:{ _id : ?0 } }} , " )
+    Optional<Coach> findAexp(String id);
+    @Query(
+            "{ 'workExp' : {$elemMatch:{ _id : ?0  }} }")
+    Optional<Coach> findWorkExp(String id);
     @Query("{ $or: [ { 'name' : /?0/ } , { 'type' : /?0/ } ] }")
     Page<Coach> findAllByNameOrType(String key, Pageable page);
     @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/  ," +
@@ -26,6 +33,9 @@ public interface CoachRepository extends MongoRepository<Coach,String> {
     @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/ ," +
             "$or: [ { 'name' : { $regex : new RegExp(?3,'i') } } , { 'description' : { $regex : new RegExp(?3,'i') } } ]  }")
     List<Coach> findAllByRateTOrTypeOrGenderOrName(int rate, String type, String gender, String key);
+
+    Boolean existsByUsername(String name);
+    Boolean existsByEmail(String email);
 
 
 }

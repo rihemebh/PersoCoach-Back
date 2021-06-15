@@ -1,4 +1,4 @@
-package com.website.persocoach.services;
+package com.website.persocoach.security.jwt;
 
 import com.website.persocoach.Models.ProgramRequest;
 import com.website.persocoach.repositories.RequestRepositoriy;

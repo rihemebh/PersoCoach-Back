@@ -1,13 +1,8 @@
 package com.website.persocoach.controllers;
 
-import com.website.persocoach.Models.Client;
-import com.website.persocoach.Models.Coach;
-import com.website.persocoach.Models.ProgramRequest;
-import com.website.persocoach.Models.Review;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.ReviewRepository;
-import com.website.persocoach.services.CoachService;
-import com.website.persocoach.services.RequestService;
+import com.website.persocoach.Models.*;
+import com.website.persocoach.repositories.*;
+import com.website.persocoach.security.jwt.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +10,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -28,19 +24,32 @@ import java.util.*;
 
 public class CoachController {
 
+
+    @Autowired
+    PasswordEncoder encoder;
     CoachService repository;
     @Autowired
     CoachRepository repo;
-    RequestService service;
+    @Autowired
+    BriefProgramRepository brepo;
+    @Autowired
+    RequestRepositoriy Reqrepo;
     @Autowired
     ReviewRepository ReviewRepo;
+    @Autowired
+    ClientRepository clientRepository;
+    @Autowired
+    ClientRepository clientRepo;
+    @Autowired
+    ProgramRepository repo1;
+
 
     Collection<Coach> coaches = new ArrayList<>();
 
-    CoachController(CoachService repository, RequestService service) {
+    CoachController(CoachService repository) {
         super();
         this.repository = repository;
-        this.service = service;
+
     }
 
 
@@ -71,32 +80,6 @@ public class CoachController {
         return repo.findById(id);
     }
 
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable  String id,
-                            @RequestParam Optional<String> gender,
-                            @RequestParam String goal,
-                            @RequestParam Optional<Integer> age,
-                            @RequestParam Optional<Double> height,
-                            @RequestParam Optional<Double> weight,
-                            @RequestParam Optional<File> pic,
-                            @RequestParam String practice
-    ) {
-        Coach coach = repo.findById(id).orElse(null);
-        Client client;
-        try{
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            client = (Client) principal;
-        ProgramRequest prog =new ProgramRequest(coach,client,height.orElse(client.getHeight()),
-        weight.orElse(client.getWeight()),practice,gender.orElse(client.getGender()),
-        age.orElse(client.getAge()),goal,pic.orElse(null));
-            service.addRequest(prog);
-            System.out.println("Request saved" + prog);
-        }catch(Exception e ){
-
-        }
-
-    }
-
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
     public int getNbCoaches(@RequestParam("key") Optional<String> key,
                             @RequestParam("type") Optional<String> type,
@@ -113,8 +96,36 @@ public class CoachController {
         return ResponseEntity.ok().build();
     }
 
+
+
+
+
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Coach> updateCoach(@RequestBody Coach c) {
+        c.setPassword(encoder.encode(c.getPassword()));
+       List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
+        BriefProgram bprogram;
+        for (ProgramRequest prog: progs
+             ) {
+            bprogram = brepo.findByRequest(prog).orElse(null);
+            if(bprogram != null){
+                bprogram.setRequest(prog);
+                brepo.save(bprogram);
+            }
+
+            prog.setCoach(c);
+
+            Reqrepo.save(prog);
+        }
+       List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
+        if (programs != null)
+        {
+            for (DetailedProgram prog: programs
+            ) {
+                prog.setCoach(c);
+                repo1.save(prog);
+            }
+        }
         repository.saveCoach(c);
         return ResponseEntity.ok().body(c);
     }
@@ -124,8 +135,33 @@ public class CoachController {
 
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
+    }
+/*********** Requests ***********/
 
+@RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
+public List<ProgramRequest> getAllRequests(@PathVariable String id){
+    Coach c =repo.findById(id).orElse(null);
+    return   Reqrepo.getAllByCoach(c);
+}
 
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
+    public void saveRequest(@PathVariable  String id,
+                            @RequestParam String gender,
+                            @RequestParam String goal,
+                            @RequestParam Integer age,
+                            @RequestParam Double height,
+                            @RequestParam Double weight,
+                            @RequestParam String c,
+                            @RequestParam String practice
+
+    ) {
+
+        Client client = clientRepo.findById(c).orElse(null);
+        Coach coach = repo.findById(id).orElse(null);
+
+        ProgramRequest prog =new ProgramRequest(coach,client,height,
+                weight, practice, gender, age,goal,"pending");
+        Reqrepo.save(prog);
     }
 
 
@@ -141,18 +177,26 @@ public class CoachController {
      double r=rate;
      try{
          if (reviews.size() > 0) {
-             for(int i=0; i< reviews.size() ;i++){
-                 r+= reviews.get(i).getRate();
+             for (Review review : reviews) {
+                 r += review.getRate();
 
 
              }
-             coach.setRate( (int) ((r/reviews.size() +1) % 5));
-             for(int i=0; i< reviews.size() ;i++){
-                reviews.get(i).getCoach().setRate(coach.getRate());
-                 ReviewRepo.save(reviews.get(i));
+             if (r  % 5 == 0){
+                 assert coach != null;
+                 coach.setRate(5);
+             }else{
+                 assert coach != null;
+                 coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
+             }
+
+             for (Review review : reviews) {
+                 review.getCoach().setRate(coach.getRate());
+                 ReviewRepo.save(review);
 
              }
          }else{
+             assert coach != null;
              coach.setRate(rate);
          }
      }catch(Exception e){
@@ -161,13 +205,13 @@ public class CoachController {
      }
 
      repository.saveCoach(coach);
-     client = new Client(principal.toString());
+
      try {
-         client = (Client) principal;
+         client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
 
      }catch(Exception e){
          System.out.println(e);
-
+         client = new Client(principal.toString());
      }
      ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
  }
