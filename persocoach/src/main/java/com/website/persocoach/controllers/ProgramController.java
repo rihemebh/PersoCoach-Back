@@ -1,10 +1,7 @@
 package com.website.persocoach.controllers;
 
 import com.website.persocoach.Models.*;
-import com.website.persocoach.repositories.BriefProgramRepository;
-import com.website.persocoach.repositories.CoachRepository;
-import com.website.persocoach.repositories.ProgramRepository;
-import com.website.persocoach.repositories.RequestRepositoriy;
+import com.website.persocoach.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +28,8 @@ public class ProgramController {
     RequestRepositoriy reqrepo;
     @Autowired
     CoachRepository crepo;
+    @Autowired
+    ClientRepository clientRepo;
 
 /****************************Brief Program***************************/
 
@@ -63,9 +62,14 @@ public class ProgramController {
     }
 
     @RequestMapping(value = "/bprogram/{id}/response", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BriefProgram> bprogramesp(@PathVariable String id,@RequestBody String rep) {
-        BriefProgram prog  = repo.findById(id).orElse(null);
-        prog.getRequest().setStatus(rep);
+    public ResponseEntity<BriefProgram> bprogramesp(@PathVariable String id,@RequestBody response resp) {
+        ProgramRequest req = reqrepo.findById(id).orElse(null);
+        BriefProgram prog  = repo.findByRequest(req).orElse(null);
+        assert prog != null;
+        assert req != null;
+        req.setStatus(resp.getRep());
+        reqrepo.save(req);
+        prog.getRequest().setStatus(resp.getRep());
         repo.save(prog);
         return ResponseEntity.ok().body(prog);
     }
@@ -81,12 +85,33 @@ public class ProgramController {
         return repo.findByRequest(request);
     }
 
+    @RequestMapping(value ="program/{id}/bprogram", method = RequestMethod.POST)
+    public Optional<BriefProgram> getBriefProgramfromProg(@PathVariable String id) {
+       DetailedProgram p =  repo1.findById(id).orElse(null);
+       Optional<BriefProgram> b = null;
+if(p != null){
+    ProgramRequest req = p.getRequest();
+
+    b = repo.findByRequest(req);
+
+}
+
+
+
+        return b;
+    }
+
+
     /****************************detailed Program***************************/
 
     @RequestMapping(value = "/programs/{id}", method = RequestMethod.GET)
     public List<DetailedProgram> getAll(@PathVariable String id){
         Coach c = crepo.findById(id).orElse(null);
+        Client cl = clientRepo.findById(id).orElse(null);
+        if(c != null)
         return  repo1.findAllByCoach(c).orElse(null);
+        else
+          return  repo1.findAllByClient(cl).orElse(null);
     }
 
     @RequestMapping(value = "/program/add", method = RequestMethod.PUT)

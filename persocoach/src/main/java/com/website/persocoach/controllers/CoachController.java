@@ -38,8 +38,6 @@ public class CoachController {
     ReviewRepository ReviewRepo;
     @Autowired
     ClientRepository clientRepository;
-    //@Autowired
-   // RequestRepository requestRepository;
     @Autowired
     ClientRepository clientRepo;
     @Autowired
@@ -80,31 +78,6 @@ public class CoachController {
     public Optional<Coach> getCoach(@PathVariable String id) {
 
         return repo.findById(id);
-    }
-    @RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
-    public List<ProgramRequest> getAllRequests(@PathVariable String id){
-      Coach c =repo.findById(id).orElse(null);
-    return   Reqrepo.getAllByCoach(c);
-    }
-
-    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable  String id,
-                            @RequestParam String gender,
-                            @RequestParam String goal,
-                            @RequestParam Integer age,
-                            @RequestParam Double height,
-                            @RequestParam Double weight,
-                            @RequestParam String c,
-                            @RequestParam String practice
-
-    ) {
-
-        Client client = clientRepo.findById(c).orElse(null);
-        Coach coach = repo.findById(id).orElse(null);
-
-        ProgramRequest prog =new ProgramRequest(coach,client,height,
-                weight, practice, gender, age,goal,"pending");
-        Reqrepo.save(prog);
     }
 
     @RequestMapping(value = "/coachesNb", method = RequestMethod.GET)
@@ -163,6 +136,33 @@ public class CoachController {
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
     }
+/*********** Requests ***********/
+
+@RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
+public List<ProgramRequest> getAllRequests(@PathVariable String id){
+    Coach c =repo.findById(id).orElse(null);
+    return   Reqrepo.getAllByCoach(c);
+}
+
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
+    public void saveRequest(@PathVariable  String id,
+                            @RequestParam String gender,
+                            @RequestParam String goal,
+                            @RequestParam Integer age,
+                            @RequestParam Double height,
+                            @RequestParam Double weight,
+                            @RequestParam String c,
+                            @RequestParam String practice
+
+    ) {
+
+        Client client = clientRepo.findById(c).orElse(null);
+        Coach coach = repo.findById(id).orElse(null);
+
+        ProgramRequest prog =new ProgramRequest(coach,client,height,
+                weight, practice, gender, age,goal,"pending");
+        Reqrepo.save(prog);
+    }
 
 
  /******* Reviews ********/
@@ -177,23 +177,26 @@ public class CoachController {
      double r=rate;
      try{
          if (reviews.size() > 0) {
-             for(int i=0; i< reviews.size() ;i++){
-                 r+= reviews.get(i).getRate();
+             for (Review review : reviews) {
+                 r += review.getRate();
 
 
              }
              if (r  % 5 == 0){
+                 assert coach != null;
                  coach.setRate(5);
              }else{
+                 assert coach != null;
                  coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
              }
 
-             for(int i=0; i< reviews.size() ;i++){
-                reviews.get(i).getCoach().setRate(coach.getRate());
-                 ReviewRepo.save(reviews.get(i));
+             for (Review review : reviews) {
+                 review.getCoach().setRate(coach.getRate());
+                 ReviewRepo.save(review);
 
              }
          }else{
+             assert coach != null;
              coach.setRate(rate);
          }
      }catch(Exception e){

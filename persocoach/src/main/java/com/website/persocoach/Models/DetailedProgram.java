@@ -20,5 +20,6 @@ public class DetailedProgram extends Program implements Serializable {
     String name;
     ArrayList<DailyProgram> dailyprogram ; // size : duration*7
     ProgramRequest request;
+    String status;
 
 }

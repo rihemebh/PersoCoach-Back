@@ -13,7 +13,7 @@ public interface RequestRepositoriy extends MongoRepository<ProgramRequest , Str
     ProgramRequest getById(String id);
     @Query("{'Coach' : ?0}")
     List<ProgramRequest> getAllByCoach(Coach c);
-
+    List<ProgramRequest> getAllByClient(Client c);
     List<ProgramRequest> getAllByCoach_Id(String c);
     List<ProgramRequest> getProgramRequestsByClient(Client client);
     List<ProgramRequest> getProgramRequestsByClient_Id(String id);

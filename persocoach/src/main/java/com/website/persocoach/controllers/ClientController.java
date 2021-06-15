@@ -1,9 +1,6 @@
 package com.website.persocoach.controllers;
 
-import com.website.persocoach.Models.Client;
-import com.website.persocoach.Models.ProgramRequest;
-import com.website.persocoach.Models.Role;
-import com.website.persocoach.Models.RoleType;
+import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.*;
 import com.website.persocoach.repositories.AdminRepository;
 import com.website.persocoach.repositories.ClientRepository;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -89,24 +87,27 @@ public class ClientController {
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update")
     public ResponseEntity<?> updateClientInfo(@RequestParam String id,
-                                              @RequestParam String name,
-                                              @RequestParam String description,
-                                              @RequestParam String pwd){
+                                              @RequestParam Optional<String> name,
+                                              @RequestParam Optional<String> description,
+                                              @RequestParam Optional<String> pwd){
         try {
             Client client1 = clientRepository.getClientById(id);
 
             if (client1== null){
                 return new ResponseEntity<String>("error updating", HttpStatus.BAD_REQUEST);
             }
-            if(name != null){
-                client1.setName(name);
+            String n = name.orElse(null);
+            if(n != null ){
+                client1.setName(n);
 
             }
-            if(description != null){
-                client1.setDescription(description);
+            String desc = description.orElse(null);
+            if(desc != null){
+                client1.setDescription(desc);
             }
-            if(pwd != null){
-                client1.setPassword(passwordEncoder.encode(pwd));
+            String pass = pwd.orElse(null);
+            if(pass != null ){
+                client1.setPassword(passwordEncoder.encode(pass));
             }
 
             Client updatedClient = clientRepository.save(client1);
@@ -114,6 +115,13 @@ public class ClientController {
         }catch(Exception e){
             return new ResponseEntity<String>("err", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /******* Requests *********/
+    @RequestMapping(value ="/{id}/requests", method = RequestMethod.GET)
+    public List<ProgramRequest> getAllRequests(@PathVariable String id){
+        Client c =clientRepository.findById(id).orElse(null);
+        return   requestRepository.getAllByClient(c);
     }
 
 }
