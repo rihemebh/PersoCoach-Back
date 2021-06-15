@@ -30,16 +30,18 @@ public class CoachController {
     CoachService repository;
     @Autowired
     CoachRepository repo;
-    @Autowired
-    BriefProgramRepository brepo;
+
     @Autowired
     RequestRepositoriy Reqrepo;
-    @Autowired
-    ReviewRepository ReviewRepo;
+
     @Autowired
     ClientRepository clientRepository;
     @Autowired
     ClientRepository clientRepo;
+    @Autowired
+    ReviewRepository ReviewRepo;
+    @Autowired
+    BriefProgramRepository brepo;
     @Autowired
     ProgramRepository repo1;
 
@@ -126,6 +128,14 @@ public class CoachController {
                 repo1.save(prog);
             }
         }
+
+        List<Review> reviews = ReviewRepo.findAllByCoach_Id(c.getId());
+
+        for(Review review : reviews){
+            review.setCoach(c);
+            ReviewRepo.save(review);
+        }
+
         repository.saveCoach(c);
         return ResponseEntity.ok().body(c);
     }

@@ -120,9 +120,12 @@ if(p != null){
         pr.setStatus("closed");
         reqrepo.save(pr);
         p.setRequest(pr);
+        p.setStatus("In progress");
         repo1.save(p);
         return  p.getId();
     }
+
+
 
     @RequestMapping(value = "/program/delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteProgram(@PathVariable String  id) {

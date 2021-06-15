@@ -15,4 +15,7 @@ public interface ProgramRepository extends MongoRepository<DetailedProgram, Stri
     @Query("{ 'client' : ?0 }")
     Optional<List<DetailedProgram>> findAllByClient(Client c);
     Optional<List<DetailedProgram>> findAllByCoach_Id(String c);
+
+    List<DetailedProgram> findAllByClient_Id(String id);
 }
+

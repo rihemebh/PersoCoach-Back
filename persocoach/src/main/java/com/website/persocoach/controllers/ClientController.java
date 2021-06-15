@@ -28,6 +28,12 @@ public class ClientController {
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private RequestRepositoriy requestRepository;
+    @Autowired
+    ReviewRepository ReviewRepo;
+    @Autowired
+    BriefProgramRepository brepo;
+    @Autowired
+    ProgramRepository repo1;
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")
@@ -109,6 +115,32 @@ public class ClientController {
             if(pass != null ){
                 client1.setPassword(passwordEncoder.encode(pass));
             }
+            ProgramRequest request = requestRepository.findByClient_id(client1.getId());
+            List<BriefProgram> bprograms = brepo.findAllByRequest(request);
+            request.setClient(client1);
+            requestRepository.save(request);
+            for(BriefProgram bprog : bprograms){
+                bprog.setRequest(request);
+                brepo.save(bprog);
+            }
+
+
+            List<DetailedProgram> program = repo1.findAllByClient_Id(client1.getId());
+            for(DetailedProgram prog : program){
+                prog.setClient(client1);
+                prog.setRequest(request);
+                repo1.save(prog);
+            }
+
+            List<Review> reviews = ReviewRepo.findAllByClient_Id(client1.getId());
+
+            for(Review review : reviews){
+                review.setClient(client1);
+                ReviewRepo.save(review);
+            }
+
+
+
 
             Client updatedClient = clientRepository.save(client1);
             return new ResponseEntity<Client>(updatedClient, HttpStatus.OK);

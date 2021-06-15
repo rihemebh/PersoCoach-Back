@@ -13,4 +13,10 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
 
     @Query("{ 'coach': ?0}")
     List<Review> findAllByCoach(Coach coach);
+
+    List<Review> findAllByClient_Id(String id);
+
+    List<Review> findAllByCoach_Id(String id);
 }
+
+
