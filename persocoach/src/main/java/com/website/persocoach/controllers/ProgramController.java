@@ -1,14 +1,21 @@
 package com.website.persocoach.controllers;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.*;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -19,7 +26,12 @@ import java.util.Optional;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ProgramController {
+ //   private static final Logger logger = (Logger) LoggerFactory.getLogger(ProgramController.class);
+ @Autowired
+ private GridFsOperations operations;
 
+    @Autowired
+    private GridFsTemplate gridFsTemplate;
     @Autowired
     BriefProgramRepository repo;
     @Autowired
@@ -144,19 +156,64 @@ if(p != null){
 
         return repo1.findById(id);
     }
+    @RequestMapping(value ="/program/{id}/day", method = RequestMethod.PUT, consumes = {"multipart/form-data"})
+    public ResponseEntity<DetailedProgram> uploadVideo(@PathVariable String id , @RequestPart("video") MultipartFile vid ,
+                            @RequestParam int day,
+                            @RequestParam int week,
+                            @RequestParam int complexity,
+                            @RequestParam String breakfast,
+                            @RequestParam Optional<String> extra,
+                            @RequestParam String lunch,
+                            @RequestParam String dinner,
+                            @RequestParam int qte,
+                            @RequestParam String restriction,
+                            @RequestParam String desc
+                            ) throws IOException {
+        DailyProgram dayprog = new DailyProgram();
+      //  System.out.printf("File name '%s' uploaded successfully.", vid.getOriginalFilename());
+      //  final String location = "C:\\Users\\rihem\\Desktop\\PersoCoach1\\PersoCoach\\persocoach\\src\\main\\java\\com\\website\\persocoach\\videos\\";
+      // byte [] data = vid.getBytes();
+      ////  Path path = Paths.get(location+vid.getOriginalFilename());
+      //  Files.write(path,data);
+      //  System.out.println(vid);
+        DBObject metaData = new BasicDBObject();
+        metaData.put("type", "video");
+        metaData.put("title", vid.getOriginalFilename());
+        ObjectId idFile= gridFsTemplate.store(
+                vid.getInputStream(), vid.getName(), vid.getContentType(), metaData);
+     //   GridFSFile file1 = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(idFile)));
+        FileUploaded file = new FileUploaded();
+        file.setFileId(idFile.toString());
 
-    @RequestMapping(value ="/program/{id}/day", method = RequestMethod.PUT)
-    public ResponseEntity<DetailedProgram> addDayProgram(@PathVariable String id,
-    @RequestBody DailyProgram d) {
+        file.setName(vid.getOriginalFilename());
+   //     file.setData(operations.getResource(file1).getInputStream());
+        //   file.setData(new Binary(BsonBinarySubType.BINARY,vid.getBytes()));
+      //  file.setName(vid.getOriginalFilename());
+        file.setType(vid.getContentType());
+        dayprog.setVideos(file);
+        dayprog.setDay(day);
+        dayprog.setWeek(week);
+        dayprog.setBreakfast(breakfast);
+        dayprog.setDinner(dinner);
+        dayprog.setLunch(lunch);
+        if(extra.isPresent()) dayprog.setExtra(extra.orElse(""));
+        dayprog.setRestrictions(restriction);
+        dayprog.setWaterQuantity(qte);
+        dayprog.setActivitydesritpion(desc);
+
+        dayprog.setComplexity(complexity);
+
        DetailedProgram dp=  repo1.findById(id).orElse(null);
+
         ArrayList<DailyProgram> daily;
         assert dp != null;
         if(dp.getDailyprogram() == null)
            daily  = new ArrayList<>();
          else daily = dp.getDailyprogram();
-        daily.add(d);
+        daily.add(dayprog);
         dp.setDailyprogram(daily);
         repo1.save(dp);
-        return ResponseEntity.ok().body(dp);
+       return ResponseEntity.ok().body(dp);
     }
+
 }

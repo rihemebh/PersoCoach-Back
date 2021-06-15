@@ -9,8 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,44 +97,51 @@ public class CoachController {
     }
 
 
+public void update(Coach c ){
 
+    List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
+    BriefProgram bprogram;
+    for (ProgramRequest prog: progs
+    ) {
+        prog.setCoach(c);
+
+        Reqrepo.save(prog);
+        bprogram = brepo.findByRequest(prog).orElse(null);
+        if(bprogram != null){
+            bprogram.setRequest(prog);
+            brepo.save(bprogram);
+        }
+
+
+    }
+    List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
+    if (programs != null)
+    {
+        for (DetailedProgram prog: programs
+        ) {
+            prog.setCoach(c);
+            repo1.save(prog);
+        }
+    }
+
+    List<Review> reviews = ReviewRepo.findAllByCoach_Id(c.getId());
+
+    for(Review review : reviews){
+        review.setCoach(c);
+        ReviewRepo.save(review);
+    }
+
+    repository.saveCoach(c);
+    }
 
 
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Coach> updateCoach(@RequestBody Coach c) {
+    public ResponseEntity<Coach> updateCoach(@PathVariable String id, @RequestBody Coach c) {
+        Coach c1 = repo.findById(id).orElse(null);
+        c.setRate(c1.getRate());
+        c.setRoles(c1.getRoles());
         c.setPassword(encoder.encode(c.getPassword()));
-       List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
-        BriefProgram bprogram;
-        for (ProgramRequest prog: progs
-             ) {
-            bprogram = brepo.findByRequest(prog).orElse(null);
-            if(bprogram != null){
-                bprogram.setRequest(prog);
-                brepo.save(bprogram);
-            }
-
-            prog.setCoach(c);
-
-            Reqrepo.save(prog);
-        }
-       List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
-        if (programs != null)
-        {
-            for (DetailedProgram prog: programs
-            ) {
-                prog.setCoach(c);
-                repo1.save(prog);
-            }
-        }
-
-        List<Review> reviews = ReviewRepo.findAllByCoach_Id(c.getId());
-
-        for(Review review : reviews){
-            review.setCoach(c);
-            ReviewRepo.save(review);
-        }
-
-        repository.saveCoach(c);
+     update(c);
         return ResponseEntity.ok().body(c);
     }
 
@@ -179,11 +184,13 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
 
 
  @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
- public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate){
-     Client client;
+ public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate,
+ @RequestParam String clientId
+ ){
+
      Coach coach= repo.findById(id).orElse(null);
      List<Review> reviews = ReviewRepo.findAllByCoach(coach);
-     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
      double r=rate;
      try{
          if (reviews.size() > 0) {
@@ -197,7 +204,7 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
                  coach.setRate(5);
              }else{
                  assert coach != null;
-                 coach.setRate( (int) ((r/(reviews.size() +1)) % 5));
+                 coach.setRate( (int) ((r/(reviews.size() +1)) % 6));
              }
 
              for (Review review : reviews) {
@@ -214,16 +221,12 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
          System.out.println(e);
      }
 
-     repository.saveCoach(coach);
+     assert coach != null;
+     update(coach);
 
-     try {
-         client =  clientRepo.findByUsername(((UserDetails)principal).getUsername());
-
-     }catch(Exception e){
-         System.out.println(e);
-         client = new Client(principal.toString());
-     }
+     Client client = clientRepository.findById(clientId).orElse(null);
      ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
+
  }
     @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
     public List<Review> getCoachesReview(@PathVariable String id){
