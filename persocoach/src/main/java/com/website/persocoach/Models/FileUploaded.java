@@ -2,8 +2,9 @@ package com.website.persocoach.Models;
 
 
 import lombok.Data;
-import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
+
+import java.io.InputStream;
 
 @Data
 public class FileUploaded {
@@ -12,5 +13,5 @@ public class FileUploaded {
     String fileId;
     String name;
     String type;
-    Binary data;
+    InputStream data;
 }

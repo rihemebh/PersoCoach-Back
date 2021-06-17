@@ -17,6 +17,11 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
     List<Review> findAllByClient_Id(String id);
 
     List<Review> findAllByCoach_Id(String id);
+
+    @Query("{ $or: [ { 'id' : { $regex : new RegExp(?0,'i') } } , { 'text' : { $regex : new RegExp(?0,'i') } } ]}")
+    List<Review> findAllByKey(String key);
+
+
 }
 
 

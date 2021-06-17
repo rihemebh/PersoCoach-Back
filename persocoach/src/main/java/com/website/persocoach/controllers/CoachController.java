@@ -74,6 +74,7 @@ public class CoachController {
 
     }
 
+
     @RequestMapping(value ="/coach/{id}", method = RequestMethod.GET)
     public Optional<Coach> getCoach(@PathVariable String id) {
 
@@ -235,6 +236,13 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
         return ReviewRepo.findAllByCoach(coach.orElse(null));
     }
 
+    @RequestMapping(value = "/reviews", method = RequestMethod.GET)
+    public List<Review> getAllReview(@RequestParam String key){
+
+
+        return ReviewRepo.findAllByKey(key);
+    }
+
     @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Review> updateReview(@RequestBody Review  review){
         //Review review = ReviewRepo.findById(id).orElse(null);
@@ -242,7 +250,7 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
         return ResponseEntity.ok().body(r);
     }
 
-    @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/coach/review/delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteReview(@PathVariable String  id) {
         ReviewRepo.deleteById(id);
         return ResponseEntity.ok().build();

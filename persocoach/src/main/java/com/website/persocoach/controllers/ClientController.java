@@ -35,6 +35,8 @@ public class ClientController {
     @Autowired
     ProgramRepository repo1;
 
+
+
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> addClient(@RequestBody Client client){
@@ -88,8 +90,25 @@ public class ClientController {
         }catch(Exception e){
             return new ResponseEntity<String>("error getting client requests", HttpStatus.BAD_REQUEST);
         }
+
+
     }
 
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/clients")
+    public List<Client> getClients(@RequestParam String key){
+
+
+
+        return clientRepository.findAllByKey(key);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping("/delete/{id}")
+    public void DeletetClient(@PathVariable String id){
+         clientRepository.deleteById(id);
+    }
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update")
     public ResponseEntity<?> updateClientInfo(@RequestParam String id,

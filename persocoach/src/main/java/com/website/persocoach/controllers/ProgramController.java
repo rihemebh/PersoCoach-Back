@@ -2,12 +2,15 @@ package com.website.persocoach.controllers;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.website.persocoach.Models.*;
 import com.website.persocoach.repositories.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.MediaType;
@@ -16,8 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -171,10 +178,10 @@ if(p != null){
                             ) throws IOException {
         DailyProgram dayprog = new DailyProgram();
       //  System.out.printf("File name '%s' uploaded successfully.", vid.getOriginalFilename());
-      //  final String location = "C:\\Users\\rihem\\Desktop\\PersoCoach1\\PersoCoach\\persocoach\\src\\main\\java\\com\\website\\persocoach\\videos\\";
-      // byte [] data = vid.getBytes();
-      ////  Path path = Paths.get(location+vid.getOriginalFilename());
-      //  Files.write(path,data);
+        final String location = "C:\\Users\\rihem\\Desktop\\PersoCoach1\\PersoCoach-Front\\src\\assets\\videos\\";
+         byte [] data = vid.getBytes();
+        Path path = Paths.get(location+vid.getOriginalFilename());
+        Files.write(path,data);
       //  System.out.println(vid);
         DBObject metaData = new BasicDBObject();
         metaData.put("type", "video");
@@ -196,6 +203,8 @@ if(p != null){
         dayprog.setBreakfast(breakfast);
         dayprog.setDinner(dinner);
         dayprog.setLunch(lunch);
+        dayprog.setProgress(0.0);
+        dayprog.setStatus("empty");
         if(extra.isPresent()) dayprog.setExtra(extra.orElse(""));
         dayprog.setRestrictions(restriction);
         dayprog.setWaterQuantity(qte);
@@ -214,6 +223,45 @@ if(p != null){
         dp.setDailyprogram(daily);
         repo1.save(dp);
        return ResponseEntity.ok().body(dp);
+    }
+    @RequestMapping(value ="/program/{id}/day/progress", method = RequestMethod.GET)
+    public void saveProgress(@PathVariable String id, @RequestParam Double progress, @RequestParam int day){
+
+        DetailedProgram dp=  repo1.findById(id).orElse(null);
+        assert dp != null;
+        ArrayList<DailyProgram> daily;
+        if(dp.getDailyprogram() != null){
+
+            daily = dp.getDailyprogram();
+
+           DailyProgram d=  daily.get(day-1);
+           Double prog= progress;
+           if(progress == 99) prog = 100.0;
+           d.setProgress(prog);
+           d.setStatus("completed");
+           daily.set(day-1,d);
+           dp.setDailyprogram(daily);
+           repo1.save(dp);
+
+        }
+
+
+
+
+    }
+
+    @GetMapping("/video/{id}")
+    public InputStream getVidep(@PathVariable String id) throws Exception {
+
+        GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(id)));
+        FileUploaded video = new FileUploaded() ;
+        assert file != null;
+        assert file.getMetadata() != null;
+        video.setName(file.getMetadata().get("title").toString());
+        video.setData(operations.getResource(file).getInputStream());
+
+        return video.getData();
+        //FileCopyUtils.copy(video.getStream(), response.getOutputStream());
     }
 
 }
