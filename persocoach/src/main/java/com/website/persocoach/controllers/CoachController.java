@@ -75,7 +75,7 @@ public class CoachController {
     }
 
 
-    @RequestMapping(value ="/coach/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/coach/{id}", method = RequestMethod.GET)
     public Optional<Coach> getCoach(@PathVariable String id) {
 
         return repo.findById(id);
@@ -92,57 +92,71 @@ public class CoachController {
     }
 
     @RequestMapping(value = "/coach/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteCoach(@PathVariable String  id) {
+    public ResponseEntity<?> deleteCoach(@PathVariable String id) {
         repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
 
-public void update(Coach c ){
+    public void update(Coach c) {
 
-    List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
-    BriefProgram bprogram;
-    for (ProgramRequest prog: progs
-    ) {
-        prog.setCoach(c);
-
-        Reqrepo.save(prog);
-        bprogram = brepo.findByRequest(prog).orElse(null);
-        if(bprogram != null){
-            bprogram.setRequest(prog);
-            brepo.save(bprogram);
-        }
-
-
-    }
-    List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
-    if (programs != null)
-    {
-        for (DetailedProgram prog: programs
+        List<ProgramRequest> progs = Reqrepo.getAllByCoach_Id(c.getId());
+        BriefProgram bprogram;
+        for (ProgramRequest prog : progs
         ) {
             prog.setCoach(c);
-            repo1.save(prog);
+
+            Reqrepo.save(prog);
+            bprogram = brepo.findByRequest(prog).orElse(null);
+            if (bprogram != null) {
+                bprogram.setRequest(prog);
+                brepo.save(bprogram);
+            }
+
+
         }
-    }
+        List<DetailedProgram> programs = repo1.findAllByCoach_Id(c.getId()).orElse(null);
+        if (programs != null) {
+            for (DetailedProgram prog : programs
+            ) {
+                prog.setCoach(c);
+                repo1.save(prog);
+            }
+        }
 
-    List<Review> reviews = ReviewRepo.findAllByCoach_Id(c.getId());
+        List<Review> reviews = ReviewRepo.findAllByCoach_Id(c.getId());
 
-    for(Review review : reviews){
-        review.setCoach(c);
-        ReviewRepo.save(review);
-    }
+        for (Review review : reviews) {
+            review.setCoach(c);
+            ReviewRepo.save(review);
+        }
 
-    repository.saveCoach(c);
+        repository.saveCoach(c);
     }
 
 
     @RequestMapping(value = "/coach/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Coach> updateCoach(@PathVariable String id, @RequestBody Coach c) {
-        Coach c1 = repo.findById(id).orElse(null);
-        c.setRate(c1.getRate());
-        c.setRoles(c1.getRoles());
-        c.setPassword(encoder.encode(c.getPassword()));
-     update(c);
+    public ResponseEntity<Coach> updateCoach(@PathVariable String id,
+                                             @RequestParam String name
+                                           , @RequestParam String gender
+                                           , @RequestParam String type
+                                           , @RequestParam String description
+                                           , @RequestParam String email
+                                           , @RequestParam Optional<String> password
+                                           , @RequestBody Experiences exp)
+                                            {
+        Coach c = repo.findById(id).orElse(null);
+
+        assert c != null;
+        c.setName(name);
+        c.setGender(gender);
+        c.setDescription(description);
+        c.setType(type);
+        c.setEmail(email);
+        c.setAcadamicExp(exp.getAcadamicExp());
+        c.setWorkExp(exp.getWorkExp());
+        if (password.isPresent()) c.setPassword(password.orElse(null));
+        update(c);
         return ResponseEntity.ok().body(c);
     }
 
@@ -152,16 +166,17 @@ public void update(Coach c ){
         repository.saveCoach(c);
         return ResponseEntity.created(new URI("/coach/add" + c.getId())).body(c);
     }
-/*********** Requests ***********/
 
-@RequestMapping(value ="/coach/{id}/requests", method = RequestMethod.GET)
-public List<ProgramRequest> getAllRequests(@PathVariable String id){
-    Coach c =repo.findById(id).orElse(null);
-    return   Reqrepo.getAllByCoach(c);
-}
+    /*********** Requests ***********/
+
+    @RequestMapping(value = "/coach/{id}/requests", method = RequestMethod.GET)
+    public List<ProgramRequest> getAllRequests(@PathVariable String id) {
+        Coach c = repo.findById(id).orElse(null);
+        return Reqrepo.getAllByCoach(c);
+    }
 
     @RequestMapping(value = "/coach/{id}", method = RequestMethod.PUT)
-    public void saveRequest(@PathVariable  String id,
+    public void saveRequest(@PathVariable String id,
                             @RequestParam String gender,
                             @RequestParam String goal,
                             @RequestParam Integer age,
@@ -175,83 +190,84 @@ public List<ProgramRequest> getAllRequests(@PathVariable String id){
         Client client = clientRepo.findById(c).orElse(null);
         Coach coach = repo.findById(id).orElse(null);
 
-        ProgramRequest prog =new ProgramRequest(coach,client,height,
-                weight, practice, gender, age,goal,"pending");
+        ProgramRequest prog = new ProgramRequest(coach, client, height,
+                weight, practice, gender, age, goal, "pending");
         Reqrepo.save(prog);
     }
 
 
- /******* Reviews ********/
+    /******* Reviews ********/
 
 
- @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
- public void saveReview(@PathVariable String  id,@RequestParam Optional<String> desc,@RequestParam int rate,
- @RequestParam String clientId
- ){
+    @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.PUT)
+    public void saveReview(@PathVariable String id, @RequestParam Optional<String> desc, @RequestParam int rate,
+                           @RequestParam String clientId
+    ) {
 
-     Coach coach= repo.findById(id).orElse(null);
-     List<Review> reviews = ReviewRepo.findAllByCoach(coach);
+        Coach coach = repo.findById(id).orElse(null);
+        List<Review> reviews = ReviewRepo.findAllByCoach(coach);
 
-     double r=rate;
-     try{
-         if (reviews.size() > 0) {
-             for (Review review : reviews) {
-                 r += review.getRate();
+        double r = rate;
+        try {
+            if (reviews.size() > 0) {
+                for (Review review : reviews) {
+                    r += review.getRate();
 
 
-             }
-             if (r  % 5 == 0){
-                 assert coach != null;
-                 coach.setRate(5);
-             }else{
-                 assert coach != null;
-                 coach.setRate( (int) ((r/(reviews.size() +1)) % 6));
-             }
+                }
+                if (r % 5 == 0) {
+                    assert coach != null;
+                    coach.setRate(5);
+                } else {
+                    assert coach != null;
+                    coach.setRate((int) ((r / (reviews.size() + 1)) % 6));
+                }
 
-             for (Review review : reviews) {
-                 review.getCoach().setRate(coach.getRate());
-                 ReviewRepo.save(review);
+                for (Review review : reviews) {
+                    review.getCoach().setRate(coach.getRate());
+                    ReviewRepo.save(review);
 
-             }
-         }else{
-             assert coach != null;
-             coach.setRate(rate);
-         }
-     }catch(Exception e){
-         System.out.println(coach);
-         System.out.println(e);
-     }
+                }
+            } else {
+                assert coach != null;
+                coach.setRate(rate);
+            }
+        } catch (Exception e) {
+            System.out.println(coach);
+            System.out.println(e);
+        }
 
-     assert coach != null;
-     update(coach);
+        assert coach != null;
+        update(coach);
 
-     Client client = clientRepository.findById(clientId).orElse(null);
-     ReviewRepo.save(new Review(client,coach, desc.orElse(""),rate,new Date(System.currentTimeMillis())));
+        Client client = clientRepository.findById(clientId).orElse(null);
+        ReviewRepo.save(new Review(client, coach, desc.orElse(""), rate, new Date(System.currentTimeMillis())));
 
- }
+    }
+
     @RequestMapping(value = "/coach/{id}/review", method = RequestMethod.GET)
-    public List<Review> getCoachesReview(@PathVariable String id){
+    public List<Review> getCoachesReview(@PathVariable String id) {
         Optional<Coach> coach = repo.findById(id);
 
         return ReviewRepo.findAllByCoach(coach.orElse(null));
     }
 
     @RequestMapping(value = "/reviews", method = RequestMethod.GET)
-    public List<Review> getAllReview(@RequestParam String key){
+    public List<Review> getAllReview(@RequestParam String key) {
 
 
         return ReviewRepo.findAllByKey(key);
     }
 
     @RequestMapping(value = "/coach/review/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Review> updateReview(@RequestBody Review  review){
+    public ResponseEntity<Review> updateReview(@RequestBody Review review) {
         //Review review = ReviewRepo.findById(id).orElse(null);
         Review r = ReviewRepo.save(review);
         return ResponseEntity.ok().body(r);
     }
 
     @RequestMapping(value = "/coach/review/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteReview(@PathVariable String  id) {
+    public ResponseEntity<?> deleteReview(@PathVariable String id) {
         ReviewRepo.deleteById(id);
         return ResponseEntity.ok().build();
     }

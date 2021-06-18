@@ -58,6 +58,17 @@ public class AdminController {
         coach_user.setName(name);
         coach_user.setType(type);
         coach_user.setGender(gender);
+        if(gender.equals("Women")){
+            if(type.equals("Sport"))
+            coach_user.setUrl("https://www.ekyno.com/wp-content/uploads/elementor/thumbs/coach-perso-image-libre-o8tzjqh5l4w9r7koycnmk9kosk8y8mm0ybpwixkt2s.jpg");
+            else   coach_user.setUrl("https://www.wholeintent.com/media/k2/items/cache/eb6c7c01c4e98e1f2578f9959463b973_XL.jpg");
+        }
+
+        else{
+            if(type.equals("Sport"))
+                coach_user.setUrl("https://www.musculaction.com/images/intro-coach-sportif.jpg");
+            else   coach_user.setUrl("https://img.themanual.com/image/themanual/athletic-man-eating-banana-after-workout-outdoors.jpg");
+        }
         try{
             coachRepository.save(coach_user);
         }catch(Exception e){
