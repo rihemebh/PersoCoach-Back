@@ -19,4 +19,5 @@ public interface RequestRepositoriy extends MongoRepository<ProgramRequest , Str
     List<ProgramRequest> getProgramRequestsByClient_Id(String id);
 
 
-}
+    ProgramRequest findByClient_id(String id);
+  }

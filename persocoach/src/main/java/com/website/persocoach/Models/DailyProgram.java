@@ -15,7 +15,9 @@ public class DailyProgram implements Serializable {
     String extra;
     int WaterQuantity;
     String restrictions;
-    String videos;
+    FileUploaded videos;
     String activitydesritpion;
+    Double progress;
+    String status;
 
 }

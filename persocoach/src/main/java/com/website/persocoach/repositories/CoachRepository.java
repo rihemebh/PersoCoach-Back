@@ -25,7 +25,7 @@ public interface CoachRepository extends MongoRepository<Coach,String> {
     @Query(
             "{ 'workExp' : {$elemMatch:{ _id : ?0  }} }")
     Optional<Coach> findWorkExp(String id);
-    @Query("{ $or: [ { 'name' : /?0/ } , { 'type' : /?0/ } ] }")
+    @Query("{ $or: [ { 'name' : /?0/ } , { 'type' : /?0/ }  ] }")
     Page<Coach> findAllByNameOrType(String key, Pageable page);
     @Query("{'rate' : { $lte : ?0 }  , 'gender': /^?2/ , 'type' : /?1/  ," +
             "$or: [ { 'name' : { $regex : new RegExp(?3,'i') } } , { 'description' : { $regex : new RegExp(?3,'i') } } ]  }")

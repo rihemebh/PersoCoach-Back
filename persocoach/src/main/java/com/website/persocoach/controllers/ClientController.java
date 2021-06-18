@@ -28,6 +28,14 @@ public class ClientController {
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private RequestRepositoriy requestRepository;
+    @Autowired
+    ReviewRepository ReviewRepo;
+    @Autowired
+    BriefProgramRepository brepo;
+    @Autowired
+    ProgramRepository repo1;
+
+
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")
@@ -82,8 +90,25 @@ public class ClientController {
         }catch(Exception e){
             return new ResponseEntity<String>("error getting client requests", HttpStatus.BAD_REQUEST);
         }
+
+
     }
 
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/clients")
+    public List<Client> getClients(@RequestParam String key){
+
+
+
+        return clientRepository.findAllByKey(key);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping("/delete/{id}")
+    public void DeletetClient(@PathVariable String id){
+         clientRepository.deleteById(id);
+    }
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update")
     public ResponseEntity<?> updateClientInfo(@RequestParam String id,
@@ -109,6 +134,32 @@ public class ClientController {
             if(pass != null ){
                 client1.setPassword(passwordEncoder.encode(pass));
             }
+            ProgramRequest request = requestRepository.findByClient_id(client1.getId());
+            List<BriefProgram> bprograms = brepo.findAllByRequest(request);
+            request.setClient(client1);
+            requestRepository.save(request);
+            for(BriefProgram bprog : bprograms){
+                bprog.setRequest(request);
+                brepo.save(bprog);
+            }
+
+
+            List<DetailedProgram> program = repo1.findAllByClient_Id(client1.getId());
+            for(DetailedProgram prog : program){
+                prog.setClient(client1);
+                prog.setRequest(request);
+                repo1.save(prog);
+            }
+
+            List<Review> reviews = ReviewRepo.findAllByClient_Id(client1.getId());
+
+            for(Review review : reviews){
+                review.setClient(client1);
+                ReviewRepo.save(review);
+            }
+
+
+
 
             Client updatedClient = clientRepository.save(client1);
             return new ResponseEntity<Client>(updatedClient, HttpStatus.OK);
